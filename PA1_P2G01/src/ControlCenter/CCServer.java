@@ -3,6 +3,7 @@ package ControlCenter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 /**
  * Class responsible for initializing the server and the communication between 
@@ -12,39 +13,99 @@ import java.net.Socket;
  */
 public class CCServer {
     public static void main(String[] args) {
-        Integer port = 1234;
+        String host = "127.0.0.1";
+        Integer ccPort = 1234;
+        Integer fiPort = 1235;
+        Scanner sc = new Scanner(System.in);
         Boolean stayConnected = true;
-        ServerSocket serverSocket = null;
+        Socket ccTofiSocket = null;
+        ServerSocket fiToccSocket = null;
+        HarvestState hvState = HarvestState.Initial;
+        
+        System.out.println("Introduza o número de agricultores:");
+        Integer numFarmers = sc.nextInt();
+        
+        System.out.println("Introduza o número máximo de passos:");
+        Integer numMaxSteps = sc.nextInt();
+        
+        System.out.println("Introduza o timeout dentro do Path:");
+        Integer timeoutPath = sc.nextInt();
+        
+        HarvestConfig hc = new HarvestConfig(numFarmers, numMaxSteps, 
+                timeoutPath);
         
         try {
-            serverSocket = new ServerSocket(port);
-            System.out.println("Server listening to socket " + port);
+            fiToccSocket = new ServerSocket(ccPort);
+            System.out.println("CC server listening to port " + ccPort);
         }
-        catch (IOException e) {
-            System.err.println("ERROR: Server Socket " + port + 
+        catch(IOException e) {
+            System.err.println("ERROR: Server Socket " + ccPort + 
                     " is already in use!");
             System.exit(1);
         }
         
-        while (stayConnected) {
+        while(stayConnected) {
             try {
-                Socket clientSocket = serverSocket.accept();
-                ClientThread clientThread = new ClientThread(clientSocket);
+                ccTofiSocket = new Socket(host, fiPort);
+                ClientThread clientThread = new ClientThread(ccTofiSocket, 
+                        hvState, hc);
                 clientThread.start();
+                clientThread.join();
+            } catch (IOException | InterruptedException e) {
+                System.err.println("ERROR: Unable to connect to FI server!");
             }
-            catch (IOException e) {
+            
+            try {
+                Socket clientSocket = fiToccSocket.accept();
+                ClientThread clientThread = new ClientThread(clientSocket, 
+                        hvState, hc);
+                clientThread.start();
+                clientThread.join();
+            }
+            catch(IOException | InterruptedException e) {
                 System.err.println("ERROR: Unable to accept the client's " + 
                         "request!");
+            }
+            
+            switch (hvState) {
+                case Initial:
+                    hvState = HarvestState.Prepare;
+                    break;
+                case Prepare:
+                    hvState = HarvestState.Walk;
+                    break;
+                case Walk:
+                    hvState = HarvestState.WaitToCollect;
+                    break;
+                case WaitToCollect:
+                    hvState = HarvestState.Collect;
+                    break;
+                case Collect:
+                    hvState = HarvestState.WaitToReturn;
+                    break;
+                case WaitToReturn:
+                    hvState = HarvestState.Return;
+                    break;
+                case Return:
+                    hvState = HarvestState.Store;
+                    break;
+                case Store:
+                    hvState = HarvestState.Initial;
+                    break;
+                default:
+                    hvState = HarvestState.Initial;
+                    break;
             }
         }
         
         try {
-            serverSocket.close();
-            System.out.println("Server closed on socket " + port);
+            fiToccSocket.close();
+            ccTofiSocket.close();
+            System.out.println("Server closed on socket " + ccPort);
         }
-        catch (IOException e) {
+        catch(IOException e) {
             System.err.println("ERROR: Unable to close the Server Socket " + 
-                    port);
+                    ccPort);
             System.exit(1);
         }
     }
