@@ -81,6 +81,8 @@ public class FIServer {
             System.err.println("ERROR: Unable to close server connection!");
         }
     }
+    public boolean allCorbsCollected;
+    public boolean allFarmersInGranary;
 
     public void farmerAwaiting(int id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -91,6 +93,14 @@ public class FIServer {
     }
 
     public void farmerStanding(int id, int position) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void movePath(Integer id, Integer[] position) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void moveGranary(Integer id, Integer position) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
