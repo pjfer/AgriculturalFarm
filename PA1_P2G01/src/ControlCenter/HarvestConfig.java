@@ -3,7 +3,7 @@ package ControlCenter;
 /**
  * Class where is defined all the chosen configurations for the harvest.
  * 
- * @author Pedro Ferreira
+ * @author Pedro Ferreira and Rafael Teixeira
  */
 public class HarvestConfig {
     private Integer numFarmers;

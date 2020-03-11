@@ -10,7 +10,7 @@ import java.net.Socket;
 /**
  * Class to handle the requests from clients in a thread based system.
  * 
- * @author Pedro Ferreira
+ * @author Pedro Ferreira and Rafael Teixeira
  */
 public class ClientThread extends Thread {
     private Socket clientSocket;

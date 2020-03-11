@@ -10,7 +10,7 @@ import java.net.Socket;
 /**
  * 
  * 
- * @author Pedro Ferreira
+ * @author Pedro Ferreira and Rafael Teixeira
  */
 public class FIServer {
     public static void main(String[] args) {

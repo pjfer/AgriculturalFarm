@@ -9,7 +9,7 @@ import java.util.Scanner;
  * Class responsible for initializing the server and the communication between 
  * the servers, which also works as the main class for the control centre.
  * 
- * @author Pedro Ferreira
+ * @author Pedro Ferreira and Rafael Teixeira
  */
 public class CCServer {
     public static void main(String[] args) {
