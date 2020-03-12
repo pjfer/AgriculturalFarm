@@ -1775,40 +1775,44 @@ public class FarmInfGUI extends javax.swing.JFrame {
 
     public void moveFarmer(int farmer_id, Integer[] position){
         
-        switch(farmerPosition.get(farmer_id)[0]){
-            case 0:
-                sh[farmerPosition.get(farmer_id)[1]].setText("");
-                break;
-            case 1:
-                sa[farmerPosition.get(farmer_id)[1]].setText("");
-                break;
-            case 2:
-                path[farmerPosition.get(farmer_id)[1]][farmerPosition.get(farmer_id)[2]].setText("");
-                break;
-            case 3:
-                gr[farmerPosition.get(farmer_id)[1]].setText("");
-                break;
-        }
-        
-        switch(position[0]){
-            case 0:
-                sh[position[1]].setText(farmer_id+"");
-                break;
-            case 1:
-                sa[position[1]].setText(farmer_id+"");
-                break;
-            case 2:
-                path[position[1]][position[2]].setText(farmer_id+"");
-                break;
-            case 3:
-                gr[position[1]].setText(farmer_id+"");
-                break;
+        if(farmerPosition.containsKey(farmer_id)){
+            switch(farmerPosition.get(farmer_id)[0]){
+                case 0:
+                    sh[farmerPosition.get(farmer_id)[1]].setText("");
+                    break;
+                case 1:
+                    sa[farmerPosition.get(farmer_id)[1]].setText("");
+                    break;
+                case 2:
+                    path[farmerPosition.get(farmer_id)[1]][farmerPosition.get(farmer_id)[2]].setText("");
+                    break;
+                case 3:
+                    gr[farmerPosition.get(farmer_id)[1]].setText("");
+                    break;
+            }
+
+            switch(position[0]){
+                case 0:
+                    sh[position[1]].setText(farmer_id+"");
+                    break;
+                case 1:
+                    sa[position[1]].setText(farmer_id+"");
+                    break;
+                case 2:
+                    path[position[1]][position[2]].setText(farmer_id+"");
+                    break;
+                case 3:
+                    gr[position[1]].setText(farmer_id+"");
+                    break;
+            }
+        }else{
+            sh[position[1]].setText(""+farmer_id);
         }
         farmerPosition.put(farmer_id, position);
+
     }
     
     public void placeFarmer(int farmer_id, int position){
-        sh[position].setText(""+farmer_id);
-        farmerPosition.put(farmer_id, new Integer[] {0, position});
+        
     }
 }
