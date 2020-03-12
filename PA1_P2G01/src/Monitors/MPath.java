@@ -79,6 +79,7 @@ public class MPath {
             if (Objects.equals(farmersWaiting, numFarmers)) {
                 farmersWaiting = 0;
                 farmerMoveForward.signal();
+                farmerMoveForward.await();
             }
         }
         catch (InterruptedException e) {
@@ -105,9 +106,6 @@ public class MPath {
                 
                 while (rl.getHoldCount() != numFarmers)
                     farmerMoveForward.await();
-                
-                if (rl.getHoldCount() == numFarmers)
-                    farmerMoveForward.signal();
                 
                 return false;
             }
