@@ -22,7 +22,6 @@ public class MPath {
     private Map<Integer, Integer[]> positions;
     private final FIController fiController;
     private final ReentrantLock rl;
-    private final Condition farmerProceed;
     private final Condition farmerMoveForward;
     
     public MPath(FIController fiController) {
@@ -34,7 +33,6 @@ public class MPath {
         this.positions = new HashMap<>();
         this.fiController = fiController;
         this.rl = new ReentrantLock(true);
-        this.farmerProceed = rl.newCondition();
         this.farmerMoveForward = rl.newCondition();
     }
     
@@ -47,7 +45,6 @@ public class MPath {
         this.positions = new HashMap<>();
         this.fiController = fiController;
         this.rl = new ReentrantLock(true);
-        this.farmerProceed = rl.newCondition();
         this.farmerMoveForward = rl.newCondition();
     }
     
@@ -64,7 +61,6 @@ public class MPath {
         this.positions = new HashMap<>();
         this.fiController = fiController;
         this.rl = new ReentrantLock(true);
-        this.farmerProceed = rl.newCondition();
         this.farmerMoveForward = rl.newCondition();
     }
     
@@ -78,11 +74,11 @@ public class MPath {
             farmersWaiting++;
             
             while (!Objects.equals(farmersWaiting, numFarmers))
-                farmerProceed.await();
+                farmerMoveForward.await();
             
             if (Objects.equals(farmersWaiting, numFarmers)) {
                 farmersWaiting = 0;
-                farmerProceed.signalAll();
+                farmerMoveForward.signal();
             }
         }
         catch (InterruptedException e) {
@@ -111,7 +107,7 @@ public class MPath {
                     farmerMoveForward.await();
                 
                 if (rl.getHoldCount() == numFarmers)
-                    farmerMoveForward.signalAll();
+                    farmerMoveForward.signal();
                 
                 return false;
             }
@@ -137,9 +133,18 @@ public class MPath {
     private Integer[] getPosition(Integer[] prevPosition) {
         Integer[] newPosition = prevPosition.clone();
         
-        if (!Objects.equals(newPosition[0], pathLength)) {
-            newPosition[0] += (int)(Math.random() * numSteps + 1);
-            newPosition[1] = (int)(Math.random() * (numFarmers - 1));
+        if (newPosition[0] == -1 && newPosition[1] == -1) {
+            newPosition[0] = 0;
+            
+            do {
+                newPosition[1] = (int)(Math.random() * (numFarmers - 1));
+            } while(positions.containsValue(newPosition));
+        }
+        else if (!Objects.equals(newPosition[0], pathLength)) {
+            do {
+                newPosition[0] += (int)(Math.random() * numSteps + 1);
+                newPosition[1] = (int)(Math.random() * (numFarmers - 1));
+            } while(positions.containsValue(newPosition));
         }
         else {
             newPosition[0] = -1;
@@ -155,7 +160,4 @@ public class MPath {
         this.farmersWaiting = 0;
         this.positions = new HashMap<>();
     }
-    
-    
-    
 }
