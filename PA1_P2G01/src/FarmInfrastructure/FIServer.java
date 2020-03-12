@@ -1,9 +1,11 @@
 package FarmInfrastructure;
 
+import FarmInfrastructure.GUI.FarmInfGUI;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import static java.lang.Thread.sleep;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -13,7 +15,7 @@ import java.net.Socket;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public class FIServer {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         String host = "127.0.0.1";
         Integer ccPort = 1234;
         Integer fiPort = 1235;
@@ -24,6 +26,36 @@ public class FIServer {
         BufferedReader inMessage = null;
         PrintWriter outMessage = null;
         
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(FarmInfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(FarmInfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(FarmInfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FarmInfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        FarmInfGUI fiGUI = new FarmInfGUI();
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                fiGUI.setVisible(true);
+            }
+        });
         
         try {
             ccTofiSocket = new ServerSocket(fiPort);
@@ -80,6 +112,10 @@ public class FIServer {
         catch(IOException e) {
             System.err.println("ERROR: Unable to close server connection!");
         }
+        
+        
+        
+        
     }
     public boolean allCorbsCollected;
     public boolean allFarmersInGranary;
