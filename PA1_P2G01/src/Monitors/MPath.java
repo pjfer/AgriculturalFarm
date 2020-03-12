@@ -85,7 +85,7 @@ public class MPath {
         rl.lock();
         
         try {
-            Integer[] position = this.getPosition(new Integer[] {0,0});
+            Integer[] position = this.getPosition(new Integer[] {-1, -1});
             fi.movePath(id, position);
             farmersWaiting++;
             
