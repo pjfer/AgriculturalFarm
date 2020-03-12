@@ -17,9 +17,9 @@ public class MPath {
     private final Integer movementTime;
     private final Integer numFarmers;
     private final Integer pathLength;
+    private Integer numSteps;
     private Integer farmersWaiting;
-    private final Integer numPositions;
-    private Map<Integer, Integer[]> positions;
+    private final Map<Integer, Integer[]> positions;
     private final FIServer fi;
     private final ReentrantLock rl;
     private final Condition farmerProceed;
@@ -29,8 +29,8 @@ public class MPath {
         this.movementTime = 250;
         this.numFarmers = 5;
         this.pathLength = 10;
+        this.numSteps = 2;
         this.farmersWaiting = 0;
-        this.numPositions = 5;
         this.positions = new HashMap<>();
         this.fi = new FIServer();
         this.rl = new ReentrantLock(true);
@@ -42,8 +42,8 @@ public class MPath {
         this.movementTime = 250;
         this.numFarmers = 5;
         this.pathLength = 10;
+        this.numSteps = 2;
         this.farmersWaiting = 0;
-        this.numPositions = 5;
         this.positions = new HashMap<>();
         this.fi = fi;
         this.rl = new ReentrantLock(true);
@@ -51,12 +51,12 @@ public class MPath {
         this.farmerMoveForward = rl.newCondition();
     }
     
-    public MPath(FIServer fi, Integer movementTime, Integer numPositions) {
+    public MPath(FIServer fi, Integer movementTime) {
         this.movementTime = movementTime;
         this.numFarmers = 5;
         this.pathLength = 10;
+        this.numSteps = 2;
         this.farmersWaiting = 0;
-        this.numPositions = numPositions;
         this.positions = new HashMap<>();
         this.fi = fi;
         this.rl = new ReentrantLock(true);
@@ -66,14 +66,14 @@ public class MPath {
     
     public MPath(FIServer fi, 
             Integer movementTime, 
-            Integer numPositions, 
-            Integer numFarmers) 
+            Integer numFarmers,
+            Integer numSteps) 
     {
         this.movementTime = movementTime;
         this.numFarmers = numFarmers;
         this.pathLength = 10;
+        this.numSteps = numSteps;
         this.farmersWaiting = 0;
-        this.numPositions = numPositions;
         this.positions = new HashMap<>();
         this.fi = fi;
         this.rl = new ReentrantLock(true);
@@ -85,7 +85,7 @@ public class MPath {
         rl.lock();
         
         try {
-            Integer[] position = this.getPosition(positions.get(id));
+            Integer[] position = this.getPosition(new Integer[] {0,0});
             fi.movePath(id, position);
             farmersWaiting++;
             
@@ -150,7 +150,7 @@ public class MPath {
         Integer[] newPosition = prevPosition.clone();
         
         if (!Objects.equals(newPosition[0], pathLength)) {
-            newPosition[0] += 1;
+            newPosition[0] += (int)(Math.random() * numSteps + 1);
             newPosition[1] = (int)(Math.random() * (numFarmers - 1));
         }
         else {

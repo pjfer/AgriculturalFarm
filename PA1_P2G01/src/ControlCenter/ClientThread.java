@@ -1,10 +1,9 @@
 package ControlCenter;
 
-import java.io.BufferedReader;
+import Communication.Message;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
@@ -21,60 +20,86 @@ public class ClientThread extends Thread {
         super();
     }
     
-    public ClientThread(Socket clientSocket, HarvestState hvState,
-            HarvestConfig hc) {
+    public ClientThread(Socket clientSocket, HarvestConfig hc) {
         this.clientSocket = clientSocket;
-        this.hvState = hvState;
+        this.hvState = HarvestState.Initial;
         this.hc = hc;
     }
     
     @Override
     public void run() {
-        BufferedReader messageIn = null; 
-        PrintWriter messageOut = null;
-        String message;
+        ObjectInputStream messageIn = null; 
+        ObjectOutputStream messageOut = null;
+        Message message;
+        String body;
         
         try {
-            messageIn = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()));
-            messageOut = new PrintWriter(
-                    new OutputStreamWriter(clientSocket.getOutputStream()));
+            messageIn = new ObjectInputStream(clientSocket.getInputStream());
+            messageOut = new ObjectOutputStream(clientSocket.getOutputStream());
             
             switch (hvState) {
                 case Initial:
-                    message = "numFarmers = " + hc.getNumFarmers() + 
-                    ", numMaxSteps = " + hc.getNumMaxSteps() +
-                    ", timeoutPath = " + hc.getTimeoutPath();
+                    body = "{ numFarmers: " + hc.getNumFarmers() + 
+                            ", numMaxSteps: " + hc.getNumMaxSteps() +
+                            ", timeoutPath: " + hc.getTimeoutPath() + " }";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Prepare;
                     break;
                 case Prepare:
-                    message = "All farmers can procede to the Path!";
+                    body = "Start the harvest";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Walk;
                     break;
                 case Walk:
-                    message = "Waiting for all farmers to reach the Granary!";
+                    body = "Waiting for all farmers to reach the Granary";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.WaitToCollect;
                     break;
                 case WaitToCollect:
-                    message = "Waiting for all farmers to reach the Granary!";
+                    body = "Waiting for all farmers to reach the Granary";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Collect;
                     break;
                 case Collect:
-                    message = "All farmers can start to collect!";
+                    body = "Collect the corn cobs";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.WaitToReturn;
                     break;
                 case WaitToReturn:
-                    message = "Waiting for all farmers to collect!";
+                    body = "Waiting for all farmers to collect";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Return;
                     break;
                 case Return:
-                    message = "All farmers can procede to the Path!";
+                    body = "Return with the corn cobs";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Store;
                     break;
                 case Store:
-                    message = "Waiting for all farmers to deliver the cobs!";
+                    body = "Waiting for all farmers to deliver the cobs";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Initial;
+                    break;
+                case Stop:
+                    body = "Stop the harvest";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Initial;
+                    break;
+                case Exit:
+                    body = "Exit simulation";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Initial;
                     break;
                 default:
-                    message = "Nothing to do!";
+                    body = "Nothing to do";
+                    message = new Message(body, hvState, this.getId());
+                    hvState = HarvestState.Initial;
                     break;
             }
             
-            messageOut.println(message);
+            messageOut.writeObject(message);
             messageOut.flush();
-            String clientMessage = messageIn.readLine();
+            String clientMessage = messageIn.readUTF();
             System.out.println("Client's message: " + clientMessage);
         }
         catch(IOException e) {

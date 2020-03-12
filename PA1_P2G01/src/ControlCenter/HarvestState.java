@@ -6,5 +6,6 @@ package ControlCenter;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public enum HarvestState {
-    Initial, Prepare, Walk, WaitToCollect, Collect, WaitToReturn, Return, Store
+    Initial, Prepare, Walk, WaitToCollect, Collect, WaitToReturn, Return, Store,
+    Stop, Exit
 }
