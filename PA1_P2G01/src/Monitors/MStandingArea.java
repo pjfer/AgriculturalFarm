@@ -1,6 +1,6 @@
 package Monitors;
 
-import FarmInfrastructure.FIServer;
+import FarmInfrastructure.FIController;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -9,15 +9,15 @@ import java.util.logging.Logger;
 
 public class MStandingArea {
     
-    FIServer fi;
+    FIController fiController;
     boolean proceed;
     ReentrantLock rl;
     Condition proceedPath;
     private final int totalFarmers = 5;
     private final int[] farmersPosition;
     
-    public MStandingArea(FIServer fi){
-        this.fi = fi;
+    public MStandingArea(FIController fiController){
+        this.fiController = fiController;
         proceed = false;
         rl = new ReentrantLock();
         proceedPath = rl.newCondition();
@@ -32,7 +32,7 @@ public class MStandingArea {
         rl.lock();
         try{
             int position = this.selectPosition(id);
-            fi.farmerStanding(id, position);
+            fiController.farmerStanding(id, position);
             while(!proceed){
                 proceedPath.await();
             }
@@ -46,8 +46,14 @@ public class MStandingArea {
     }
     
     public void proceedToPath(){
-        proceed = true;
-        proceedPath.signalAll();
+        rl.lock();
+        try{
+            proceed = true;
+            proceedPath.signalAll();
+        }catch(Exception e){}
+        finally{
+            rl.unlock();
+        }
     }
 
     private int selectPosition(int id) {

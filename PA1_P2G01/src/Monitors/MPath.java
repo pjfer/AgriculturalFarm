@@ -1,6 +1,6 @@
 package Monitors;
 
-import FarmInfrastructure.FIServer;
+import FarmInfrastructure.FIController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -14,57 +14,44 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public class MPath {
-    private final Integer movementTime;
-    private final Integer numFarmers;
+    private Integer movementTime;
+    private Integer numFarmers;
     private final Integer pathLength;
     private Integer farmersWaiting;
     private final Integer numPositions;
     private Map<Integer, Integer[]> positions;
-    private final FIServer fi;
+    private final FIController fiController;
     private final ReentrantLock rl;
     private final Condition farmerProceed;
     private final Condition farmerMoveForward;
     
-    public MPath() {
+    public MPath(FIController fiController) {
         this.movementTime = 250;
         this.numFarmers = 5;
         this.pathLength = 10;
         this.farmersWaiting = 0;
         this.numPositions = 5;
         this.positions = new HashMap<>();
-        this.fi = new FIServer();
+        this.fiController = fiController;
         this.rl = new ReentrantLock(true);
         this.farmerProceed = rl.newCondition();
         this.farmerMoveForward = rl.newCondition();
     }
     
-    public MPath(FIServer fi) {
-        this.movementTime = 250;
-        this.numFarmers = 5;
-        this.pathLength = 10;
-        this.farmersWaiting = 0;
-        this.numPositions = 5;
-        this.positions = new HashMap<>();
-        this.fi = fi;
-        this.rl = new ReentrantLock(true);
-        this.farmerProceed = rl.newCondition();
-        this.farmerMoveForward = rl.newCondition();
-    }
-    
-    public MPath(FIServer fi, Integer movementTime, Integer numPositions) {
+    public MPath(FIController fiController, Integer movementTime, Integer numPositions) {
         this.movementTime = movementTime;
         this.numFarmers = 5;
         this.pathLength = 10;
         this.farmersWaiting = 0;
         this.numPositions = numPositions;
         this.positions = new HashMap<>();
-        this.fi = fi;
+        this.fiController = fiController;
         this.rl = new ReentrantLock(true);
         this.farmerProceed = rl.newCondition();
         this.farmerMoveForward = rl.newCondition();
     }
     
-    public MPath(FIServer fi, 
+    public MPath(FIController fiController, 
             Integer movementTime, 
             Integer numPositions, 
             Integer numFarmers) 
@@ -75,7 +62,7 @@ public class MPath {
         this.farmersWaiting = 0;
         this.numPositions = numPositions;
         this.positions = new HashMap<>();
-        this.fi = fi;
+        this.fiController = fiController;
         this.rl = new ReentrantLock(true);
         this.farmerProceed = rl.newCondition();
         this.farmerMoveForward = rl.newCondition();
@@ -86,7 +73,7 @@ public class MPath {
         
         try {
             Integer[] position = this.getPosition(positions.get(id));
-            fi.movePath(id, position);
+            fiController.movePath(id, position);
             farmersWaiting++;
             
             while (!Objects.equals(farmersWaiting, numFarmers))
@@ -116,7 +103,7 @@ public class MPath {
 
             if (position != outsideCoordinates) {
                 positions.put(id, position);
-                fi.movePath(id, position);
+                fiController.movePath(id, position);
                 Thread.sleep(movementTime);
                 
                 while (rl.getHoldCount() != numFarmers)
@@ -160,4 +147,14 @@ public class MPath {
         
         return newPosition;
     }
+    
+    public void prepareSimulation(int nf, int to){
+        numFarmers = nf;
+        movementTime = to;
+        this.farmersWaiting = 0;
+        this.positions = new HashMap<>();
+    }
+    
+    
+    
 }

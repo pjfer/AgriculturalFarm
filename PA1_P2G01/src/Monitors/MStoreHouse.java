@@ -1,6 +1,6 @@
 package Monitors;
 
-import FarmInfrastructure.FIServer;
+import FarmInfrastructure.FIController;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 public class MStoreHouse {
     
-    private final FIServer fi;
+    private final FIController fiController;
     private final ReentrantLock rl;
     private int fToRelease;
     private int nFarmers;
@@ -17,8 +17,8 @@ public class MStoreHouse {
     private final int farmersPosition[];
     private final int totalFarmers = 5;
     
-    public MStoreHouse(FIServer fi){
-        this.fi = fi;
+    public MStoreHouse(FIController fiController){
+        this.fiController = fiController;
         this.rl = new ReentrantLock();
         this.fToRelease = 0;
         waitStart = rl.newCondition();
@@ -31,7 +31,7 @@ public class MStoreHouse {
     public void startSimulation(int id){
         rl.lock();
         try{
-            fi.farmerAwaiting(id);
+            fiController.farmerAwaiting(id);
             while(fToRelease == 0){
                 waitStart.await();
             }
@@ -48,13 +48,7 @@ public class MStoreHouse {
     
     public synchronized void enterSH(int id){
         int position = this.selectPosition(id);
-        fi.farmerEnterSH(id, position);
-    }
-    
-    public void proceedToSA(){
-        fToRelease = nFarmers;
-        waitStart.signalAll();
-        
+        fiController.farmerEnterSH(id, position);
     }
     
     public synchronized void depositCorn(){
@@ -66,9 +60,18 @@ public class MStoreHouse {
     }
     
     public void prepareSimulation(int nf, int to){
-        this.nFarmers = nf;
-        this.depositDurantion = to;
-        this.fToRelease = 0;
+        rl.lock();
+        try{
+            this.nFarmers = nf;
+            this.depositDurantion = to;
+            fToRelease = nFarmers;
+            waitStart.signalAll();
+        }catch(Exception e){
+            
+        }
+        finally{
+            rl.unlock();
+        }
     }
     
     private int selectPosition(int id){
