@@ -20,7 +20,6 @@ public class CCServer {
         Boolean stayConnected = true;
         Socket ccTofiSocket = null;
         ServerSocket fiToccSocket = null;
-        HarvestState hvState = HarvestState.Initial;
         
         System.out.println("Introduza o número de agricultores:");
         Integer numFarmers = sc.nextInt();
@@ -47,54 +46,20 @@ public class CCServer {
         while(stayConnected) {
             try {
                 ccTofiSocket = new Socket(host, fiPort);
-                ClientThread clientThread = new ClientThread(ccTofiSocket, 
-                        hvState, hc);
+                ClientThread clientThread = new ClientThread(ccTofiSocket, hc);
                 clientThread.start();
-                clientThread.join();
-            } catch (IOException | InterruptedException e) {
+            } catch(IOException e) {
                 System.err.println("ERROR: Unable to connect to FI server!");
             }
             
             try {
                 Socket clientSocket = fiToccSocket.accept();
-                ClientThread clientThread = new ClientThread(clientSocket, 
-                        hvState, hc);
+                ClientThread clientThread = new ClientThread(clientSocket, hc);
                 clientThread.start();
-                clientThread.join();
             }
-            catch(IOException | InterruptedException e) {
+            catch(IOException e) {
                 System.err.println("ERROR: Unable to accept the client's " + 
                         "request!");
-            }
-            
-            switch (hvState) {
-                case Initial:
-                    hvState = HarvestState.Prepare;
-                    break;
-                case Prepare:
-                    hvState = HarvestState.Walk;
-                    break;
-                case Walk:
-                    hvState = HarvestState.WaitToCollect;
-                    break;
-                case WaitToCollect:
-                    hvState = HarvestState.Collect;
-                    break;
-                case Collect:
-                    hvState = HarvestState.WaitToReturn;
-                    break;
-                case WaitToReturn:
-                    hvState = HarvestState.Return;
-                    break;
-                case Return:
-                    hvState = HarvestState.Store;
-                    break;
-                case Store:
-                    hvState = HarvestState.Initial;
-                    break;
-                default:
-                    hvState = HarvestState.Initial;
-                    break;
             }
         }
         

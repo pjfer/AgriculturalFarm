@@ -17,8 +17,8 @@ public class MPath {
     private Integer movementTime;
     private Integer numFarmers;
     private final Integer pathLength;
+    private Integer numSteps;
     private Integer farmersWaiting;
-    private final Integer numPositions;
     private Map<Integer, Integer[]> positions;
     private final FIController fiController;
     private final ReentrantLock rl;
@@ -29,8 +29,8 @@ public class MPath {
         this.movementTime = 250;
         this.numFarmers = 5;
         this.pathLength = 10;
+        this.numSteps = 2;
         this.farmersWaiting = 0;
-        this.numPositions = 5;
         this.positions = new HashMap<>();
         this.fiController = fiController;
         this.rl = new ReentrantLock(true);
@@ -42,8 +42,8 @@ public class MPath {
         this.movementTime = movementTime;
         this.numFarmers = 5;
         this.pathLength = 10;
+        this.numSteps = 2;
         this.farmersWaiting = 0;
-        this.numPositions = numPositions;
         this.positions = new HashMap<>();
         this.fiController = fiController;
         this.rl = new ReentrantLock(true);
@@ -53,14 +53,14 @@ public class MPath {
     
     public MPath(FIController fiController, 
             Integer movementTime, 
-            Integer numPositions, 
-            Integer numFarmers) 
+            Integer numFarmers,
+            Integer numSteps) 
     {
         this.movementTime = movementTime;
         this.numFarmers = numFarmers;
         this.pathLength = 10;
+        this.numSteps = numSteps;
         this.farmersWaiting = 0;
-        this.numPositions = numPositions;
         this.positions = new HashMap<>();
         this.fiController = fiController;
         this.rl = new ReentrantLock(true);
@@ -72,7 +72,8 @@ public class MPath {
         rl.lock();
         
         try {
-            Integer[] position = this.getPosition(positions.get(id));
+            Integer[] position = this.getPosition(new Integer[] {-1, -1});
+            positions.put(id, position);
             fiController.movePath(id, position);
             farmersWaiting++;
             
@@ -137,7 +138,7 @@ public class MPath {
         Integer[] newPosition = prevPosition.clone();
         
         if (!Objects.equals(newPosition[0], pathLength)) {
-            newPosition[0] += 1;
+            newPosition[0] += (int)(Math.random() * numSteps + 1);
             newPosition[1] = (int)(Math.random() * (numFarmers - 1));
         }
         else {
