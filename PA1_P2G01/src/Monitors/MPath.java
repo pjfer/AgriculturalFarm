@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public class MPath {
+    private Integer selected;
     private boolean toGranary;
     private Integer movementTime;
     private Integer numFarmers;
@@ -133,16 +134,17 @@ public class MPath {
             else
                 position = this.getPositionToStoreHouse(positions.get(id));
             
-            Integer[] outsideCoordinates = { -1, -1 };
+            Integer[] outsidePosition = { -1, -1 };
 
-            if (position != outsideCoordinates) {
+            if (!Arrays.equals(position, outsidePosition)) {
                 positions.put(id, position);
                 fiController.movePath(id, position);
                 Thread.sleep(movementTime);
                 farmerMoveForward.signal();
+                selected = order.peek();
                 order.add(id);
                 
-                while (!Objects.equals(order.peek(), id) || order.size() == 1)
+                while (!Objects.equals(selected, id))
                     farmerMoveForward.await();
                 
                 order.remove();
@@ -150,8 +152,10 @@ public class MPath {
                 return false;
             }
             
-            if (!order.isEmpty())
+            if (!order.isEmpty()) {
+                selected = order.peek();
                 farmerMoveForward.signal();
+            }
             else
                 positions.clear();
 
