@@ -42,7 +42,7 @@ public class TFarmer extends Thread{
             path.enterPath(id, false);
             ended_path = false;
             while(!ended_path){
-                path.moveForward(id);
+                ended_path = path.moveForward(id);
             }
             
             sh.enterSH(id);

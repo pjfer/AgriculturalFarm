@@ -186,7 +186,7 @@ public class MPath {
             newPosition[0] = prevPosition[0] + 
                     (int)(Math.random() * numSteps + 1);
             
-            if (newPosition[0] <= pathLength - 1) {
+            if (newPosition[0] < pathLength) {
                 do {
                     newPosition[1] = (int)(Math.random() * numFarmers);
                 } while(positionTaken(newPosition));

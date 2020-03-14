@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MGranary {
     private Integer collectDuration;
     private final Integer numPositions;
-    private Integer[] positions;
+    private int[] positions;
     private final FIController fiController;
     private boolean waitingForAllFarmers;
     private boolean allCorbsCollected;
@@ -25,7 +25,7 @@ public class MGranary {
     public MGranary(FIController fiController) {
         this.collectDuration = 250;
         this.numPositions = 5;
-        this.positions = new Integer[numPositions];
+        this.positions = new int[numPositions];
         this.fiController = fiController;
         this.waitingForAllFarmers = true;
         this.allCorbsCollected = false;
@@ -34,17 +34,26 @@ public class MGranary {
         this.farmerCobsCollected = rl.newCondition();
     }
     
-    public MGranary(FIController fiController, Integer collectDuration,
-            Integer numPositions) {
+    public MGranary(FIController fiController, 
+            Integer collectDuration,
+            Integer numPositions)
+    {
         this.collectDuration = collectDuration;
         this.numPositions = numPositions;
-        this.positions = new Integer[numPositions];
+        this.positions = new int[numPositions];
         this.fiController = fiController;
         this.waitingForAllFarmers = true;
         this.allCorbsCollected = false;
         this.rl = new ReentrantLock();
         this.farmerEnteringGranary = rl.newCondition();
         this.farmerCobsCollected = rl.newCondition();
+    }
+    
+    public void prepareSimulation(int to) {
+        this.collectDuration = to;
+        this.positions = new int[numPositions];
+        this.waitingForAllFarmers = true;
+        this.allCorbsCollected = false;
     }
     
     public void enterGranary(Integer id) {
@@ -54,10 +63,11 @@ public class MGranary {
             while (waitingForAllFarmers)
                 farmerEnteringGranary.await();
             
-            Integer position = (int)(Math.random() * (numPositions - 1));
+            Integer position;
             
-            while (positions[position] == 1)
-                position = (int)(Math.random() * (numPositions - 1));
+            do {
+                position = (int)(Math.random() * numPositions);
+            } while (positions[position] == 1);
             
             positions[position] = 1;
             fiController.moveGranary(id, position);
@@ -97,22 +107,29 @@ public class MGranary {
         }
     }
     
-    public synchronized void allCorbsCollected() {
-        allCorbsCollected = true;
-        farmerCobsCollected.signalAll();
-        fiController.allCorbsCollected = true;
+    public void allCorbsCollected() {
+        rl.lock();
+        
+        try {
+            allCorbsCollected = true;
+            farmerCobsCollected.signalAll();
+            fiController.allCorbsCollected = true;
+        }
+        finally {
+            rl.unlock();
+        }
     }
     
-    public synchronized void allFarmersInGranary() {
-        waitingForAllFarmers = false;
-        farmerEnteringGranary.signalAll();
-        fiController.allFarmersInGranary = true;
-    }
-    
-    public void prepareSimulation(int to){
-        collectDuration = to;
-        positions = new Integer[numPositions];
-        this.waitingForAllFarmers = true;
-        this.allCorbsCollected = false;
+    public void allFarmersInGranary() {
+        rl.lock();
+        
+        try {
+            waitingForAllFarmers = false;
+            farmerEnteringGranary.signalAll();
+            fiController.allFarmersInGranary = true;
+        }
+        finally {
+            rl.unlock();
+        }
     }
 }
