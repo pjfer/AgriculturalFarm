@@ -49,6 +49,7 @@ public class TFarmer extends Thread{
             for(int i = 0; i < 10; i++){
                 sh.depositCorn();
             }
+            ended_path = false;
         }
         
     }

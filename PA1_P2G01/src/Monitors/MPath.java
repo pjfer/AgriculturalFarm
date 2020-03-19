@@ -175,6 +175,7 @@ public class MPath {
     }
     
     private Integer[] getPositionToGranary(Integer[] prevPosition) {
+        System.out.println(prevPosition[0] + " " + prevPosition[1]);
         Integer[] newPosition = prevPosition.clone();
         
         if (newPosition[0] == -1 && newPosition[1] == -1) {
