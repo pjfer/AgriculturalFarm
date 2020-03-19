@@ -8,6 +8,8 @@ import Monitors.MPath;
 import Monitors.MStandingArea;
 import Monitors.MStoreHouse;
 import java.util.Scanner; 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FIMain {
     
@@ -60,12 +62,13 @@ public class FIMain {
         Scanner scan = new Scanner(System.in);
         
         FIServer server = new FIServer(gr, path, sa, sh);
-        while(true){
+        boolean exit = false;
+        while(!exit){
             int i = scan.nextInt();
             switch(i){
                 case(0):
                     System.out.println("Preparing Farm");
-                    server.prepareFarm(5, 500, 2);
+                    server.prepareFarm(5, 500, 1);
                     break;
                 case(1):
                     server.startCollection();
@@ -76,10 +79,24 @@ public class FIMain {
                 case(3):
                     server.returnWCorn();
                     break;
-                
+                case(4):
+                    server.stopHarvest();
+                    break;
+                case(5):
+                    server.exitSimulation();
+                    exit = true;
+                    break;
             }
         }
-        
+        for(int i = 0; i < 5; i++){
+            try {
+                threads[i].join();
+                System.out.println("Farmer "+(i+1)+ " has died");
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FIMain.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
+        fiGUI.dispose();
     
     
     }

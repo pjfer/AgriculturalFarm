@@ -15,6 +15,7 @@ public class MStandingArea {
     Condition proceedPath;
     private final int totalFarmers = 5;
     private int[] farmersPosition;
+    private boolean stopSimulation = false;
     
     public MStandingArea(FIController fiController){
         this.fiController = fiController;
@@ -30,13 +31,16 @@ public class MStandingArea {
     
     public void enterSA(int id){
         rl.lock();
+        
         try{
-            int position = this.selectPosition(id);
-            fiController.farmerStanding(id, position);
-            while(!proceed){
-                proceedPath.await();
+            if(!stopSimulation){
+                int position = this.selectPosition(id);
+                fiController.farmerStanding(id, position);
+                while(!proceed && !stopSimulation){
+                    proceedPath.await();
+                }
+                farmersPosition[position] = -1;
             }
-            farmersPosition[position] = -1;
             
         } catch (InterruptedException ex) {
             Logger.getLogger(MStandingArea.class.getName()).log(Level.SEVERE, null, ex);
@@ -66,11 +70,24 @@ public class MStandingArea {
     }
     
     public void prepareSimulation(){
+        stopSimulation = false;
         proceed = false;
         farmersPosition = new int[5];
         for(int i = 0; i < totalFarmers; i ++){
             farmersPosition[i] = -1;
         }
+    }
+    
+    public void stopSimulation(){
+        rl.lock();
+        try{
+            stopSimulation = true;
+            proceedPath.signalAll();
+        }
+        finally{
+            rl.unlock();
+        }
+        
     }
     
     

@@ -20,30 +20,11 @@ public class MGranary {
     private final ReentrantLock rl;
     private final Condition farmerEnteringGranary;
     private final Condition farmerCobsCollected;
-    
+    private boolean stopSimulation;
     
     public MGranary(FIController fiController) {
-        this.collectDuration = 250;
         this.numPositions = 5;
-        this.positions = new int[numPositions];
         this.fiController = fiController;
-        this.waitingForAllFarmers = true;
-        this.allCorbsCollected = false;
-        this.rl = new ReentrantLock();
-        this.farmerEnteringGranary = rl.newCondition();
-        this.farmerCobsCollected = rl.newCondition();
-    }
-    
-    public MGranary(FIController fiController, 
-            Integer collectDuration,
-            Integer numPositions)
-    {
-        this.collectDuration = collectDuration;
-        this.numPositions = numPositions;
-        this.positions = new int[numPositions];
-        this.fiController = fiController;
-        this.waitingForAllFarmers = true;
-        this.allCorbsCollected = false;
         this.rl = new ReentrantLock();
         this.farmerEnteringGranary = rl.newCondition();
         this.farmerCobsCollected = rl.newCondition();
@@ -54,23 +35,38 @@ public class MGranary {
         this.positions = new int[numPositions];
         this.waitingForAllFarmers = true;
         this.allCorbsCollected = false;
+        this.stopSimulation = false;
+    }
+    
+    public void stopSimulation(){
+        rl.lock();
+        try{
+            this.stopSimulation = true;
+            farmerEnteringGranary.signalAll();
+            farmerCobsCollected.signalAll();
+        }
+        finally{
+            rl.unlock();
+        }
     }
     
     public void enterGranary(Integer id) {
         rl.lock();
         
         try {
-            Integer position;
-            
-            do {
-                position = (int)(Math.random() * numPositions);
-            } while (positions[position] == 1);
-            
-            positions[position] = 1;
-            fiController.moveGranary(id, position);
-            
-            while (waitingForAllFarmers)
-                farmerEnteringGranary.await();
+            if(!stopSimulation){
+                Integer position;
+
+                do {
+                    position = (int)(Math.random() * numPositions);
+                } while (positions[position] == 1);
+
+                positions[position] = 1;
+                fiController.moveGranary(id, position);
+
+                while (waitingForAllFarmers && !stopSimulation)
+                    farmerEnteringGranary.await();
+            }
             
         }
         catch (InterruptedException e) {
@@ -84,7 +80,9 @@ public class MGranary {
     
     public synchronized void collectCob() {
         try {
-            Thread.sleep(collectDuration);
+            if(!stopSimulation){
+                Thread.sleep(collectDuration);
+            }
         }
         catch (InterruptedException e) {
             System.err.println("ERROR: Farmer was badly interrupted when "
@@ -94,10 +92,11 @@ public class MGranary {
     
     public void waitForColleagues() {
         rl.lock();
-        
         try {
-            while (!allCorbsCollected)
-                farmerCobsCollected.await();
+            if(!stopSimulation){
+                while (!allCorbsCollected && !stopSimulation)
+                    farmerCobsCollected.await();
+            }
         }
         catch (InterruptedException e) {
             System.err.println("ERROR: Farmer was badly interrupted when "

@@ -28,7 +28,8 @@ public class TFarmer extends Thread{
     public void run(){
         boolean ended_path = false;
         sh.enterSH(id);
-        while(true){
+        boolean exit = false;
+        while(!exit){
             sh.startSimulation(id);
             sa.enterSA(id);
             path.enterPath(id, true);
@@ -43,9 +44,8 @@ public class TFarmer extends Thread{
             ended_path = false;
             while(!ended_path){
                 ended_path = path.moveForward(id);
-            }
-            
-            sh.enterSH(id);
+            }     
+            exit = sh.enterSH(id);
             for(int i = 0; i < 10; i++){
                 sh.depositCorn();
             }

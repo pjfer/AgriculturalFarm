@@ -16,6 +16,8 @@ public class MStoreHouse {
     private int depositDurantion;
     private final int farmersPosition[];
     private final int totalFarmers = 5;
+    private boolean stopSimulation;
+    private boolean exitSimulation;
     
     public MStoreHouse(FIController fiController){
         this.fiController = fiController;
@@ -28,49 +30,72 @@ public class MStoreHouse {
         }
     }
     
-    public void startSimulation(int id){
-        rl.lock();
-        try{
-            fiController.farmerAwaiting(id);
-            while(fToRelease == 0){
-                waitStart.await();
-            }
-            fToRelease --;
-            this.releasePosition(id);
-        }
-        catch(Exception Ex){
-        
-        }
-        finally{
-            rl.unlock();
-        }
-    }
-    
-    public synchronized void enterSH(int id){
-        int position = this.selectPosition(id);
-        fiController.farmerEnterSH(id, position);
-    }
-    
-    public synchronized void depositCorn(){
-        try {
-            Thread.sleep(depositDurantion);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MStoreHouse.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
     public void prepareSimulation(int nf, int to){
         rl.lock();
         try{
             this.nFarmers = nf;
             this.depositDurantion = to;
             fToRelease = nFarmers;
+            this.stopSimulation = false;
+            this.exitSimulation = false;
             waitStart.signalAll();
-        }catch(Exception e){
-            
         }
         finally{
             rl.unlock();
+        }
+    }
+    public void stopSimulation(){
+        rl.lock();
+        try {
+            this.stopSimulation = true;
+        } finally {
+            rl.unlock();
+        }
+        
+    }
+    
+    public void exitSimulation(){
+        rl.lock();
+        try {
+            this.exitSimulation = true;
+            this.stopSimulation = true;
+            waitStart.signalAll();
+        } finally {
+            rl.unlock();
+        }
+    }
+        
+    public void startSimulation(int id){
+        rl.lock();
+        try{
+            fiController.farmerAwaiting(id);
+            while(fToRelease == 0 && !exitSimulation){
+                waitStart.await();
+            }
+            fToRelease --;
+            this.releasePosition(id);
+        }
+        catch(InterruptedException Ex){}
+        finally{
+            rl.unlock();
+        }
+    }
+    
+    public synchronized boolean enterSH(int id){
+        if(!exitSimulation){
+            int position = this.selectPosition(id);
+            fiController.farmerEnterSH(id, position);
+        }
+        return this.exitSimulation;
+    }
+    
+    public synchronized void depositCorn(){
+        try {
+            if(!stopSimulation){
+                Thread.sleep(depositDurantion);
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MStoreHouse.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -90,5 +115,7 @@ public class MStoreHouse {
             }
         }
     }
+    
+    
         
 }

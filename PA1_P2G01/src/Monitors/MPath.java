@@ -29,51 +29,10 @@ public class MPath {
     private final FIController fiController;
     private final ReentrantLock rl;
     private final Condition farmerMoveForward;
+    private boolean stopSimulation = false;
     
     public MPath(FIController fiController) {
-        this.toGranary = true;
-        this.movementTime = 250;
-        this.numFarmers = 5;
         this.pathLength = 10;
-        this.numSteps = 2;
-        this.farmersWaiting = 0;
-        this.order = new LinkedList<>();
-        this.positions = new HashMap<>();
-        this.fiController = fiController;
-        this.rl = new ReentrantLock(true);
-        this.farmerMoveForward = rl.newCondition();
-    }
-    
-    public MPath(FIController fiController, 
-            Integer movementTime, 
-            Integer numPositions)
-    {
-        this.toGranary = true;
-        this.movementTime = movementTime;
-        this.numFarmers = 5;
-        this.pathLength = 10;
-        this.numSteps = 2;
-        this.farmersWaiting = 0;
-        this.order = new LinkedList<>();
-        this.positions = new HashMap<>();
-        this.fiController = fiController;
-        this.rl = new ReentrantLock(true);
-        this.farmerMoveForward = rl.newCondition();
-    }
-    
-    public MPath(FIController fiController, 
-            Integer movementTime, 
-            Integer numFarmers,
-            Integer numSteps) 
-    {
-        this.toGranary = true;
-        this.movementTime = movementTime;
-        this.numFarmers = numFarmers;
-        this.pathLength = 10;
-        
-        this.farmersWaiting = 0;
-        this.order = new LinkedList<>();
-        this.positions = new HashMap<>();
         this.fiController = fiController;
         this.rl = new ReentrantLock(true);
         this.farmerMoveForward = rl.newCondition();
@@ -88,32 +47,47 @@ public class MPath {
         this.positions = new HashMap<>();
         this.numSteps = ns;
         this.selected = -1;
+        this.stopSimulation = false;
+    }
+    
+    public void stopSimulation(){
+        rl.lock();
+        try{
+            stopSimulation = true;
+            farmerMoveForward.signalAll(); 
+        }
+        finally {
+            rl.unlock();
+        }
     }
     
     public void enterPath(Integer id, boolean toGranary) {
         rl.lock();
         
         try {
-            this.toGranary = toGranary;
-            Integer[] position;
-            
-            if (toGranary)
-                position = this.getPositionToGranary(new Integer[] {-1, -1});
-            else
-                position = this.getPositionToStoreHouse(new Integer[] {-1, -1});
-            
-            positions.put(id, position);
-            fiController.movePath(id, position);
-            farmersWaiting++;
-            
-            if (Objects.equals(farmersWaiting, numFarmers)) {
-                farmersWaiting = 0;
-                farmerMoveForward.signal();
-                farmerMoveForward.await();
+            if(!stopSimulation){
+                
+                this.toGranary = toGranary;
+                Integer[] position;
+
+                if (toGranary)
+                    position = this.getPositionToGranary(new Integer[] {-1, -1});
+                else
+                    position = this.getPositionToStoreHouse(new Integer[] {-1, -1});
+
+                positions.put(id, position);
+                fiController.movePath(id, position);
+                farmersWaiting++;
+
+                if (Objects.equals(farmersWaiting, numFarmers) && !stopSimulation) {
+                    farmersWaiting = 0;
+                    farmerMoveForward.signal();
+                    farmerMoveForward.await();
+                }
+
+                while (!Objects.equals(farmersWaiting, 0) && !stopSimulation)
+                    farmerMoveForward.await();
             }
-            
-            while (!Objects.equals(farmersWaiting, 0))
-                farmerMoveForward.await();
         }
         catch (InterruptedException e) {
             System.err.println("ERROR: Farmer was badly interrupted when was "
@@ -129,39 +103,46 @@ public class MPath {
         rl.lock();
         
         try {
-            Integer[] position;
-            
-            if (toGranary)
-                position = this.getPositionToGranary(positions.get(id));
-            else
-                position = this.getPositionToStoreHouse(positions.get(id));
-            
-            Integer[] outsidePosition = { -1, -1 };
+            if(!stopSimulation){
+                Integer[] position;
 
-            if (!Arrays.equals(position, outsidePosition)) {
-                positions.put(id, position);
-                fiController.movePath(id, position);
-                Thread.sleep(movementTime);
-                farmerMoveForward.signal();
-                selected = order.peek();
-                order.add(id);
-                
-                while (!Objects.equals(selected, id))
-                    farmerMoveForward.await();
-                
-                order.remove();
-                
-                return false;
-            }
-            
-            if (!order.isEmpty()) {
-                selected = order.peek();
-                farmerMoveForward.signal();
-            }
-            else
-                positions.clear();
+                if (toGranary)
+                    position = this.getPositionToGranary(positions.get(id));
+                else
+                    position = this.getPositionToStoreHouse(positions.get(id));
 
-            return true;
+                Integer[] outsidePosition = { -1, -1 };
+
+                if (!Arrays.equals(position, outsidePosition)) {
+                    positions.put(id, position);
+                    fiController.movePath(id, position);
+                    Thread.sleep(movementTime);
+                    farmerMoveForward.signal();
+                    selected = order.peek();
+                    order.add(id);
+
+                    while (!Objects.equals(selected, id) && !stopSimulation)
+                        farmerMoveForward.await();
+                    
+                    if(!order.isEmpty()){
+                        order.remove();
+                    }
+
+                    return false;
+                }
+
+                if (!order.isEmpty()) {
+                    selected = order.peek();
+                    farmerMoveForward.signal();
+                }
+                else
+                    positions.clear();
+
+                return true;
+            }
+            else{
+                return true;
+            }
         }
         catch (InterruptedException e) {
             System.err.println("ERROR: Farmer was badly interrupted when "
@@ -175,7 +156,6 @@ public class MPath {
     }
     
     private Integer[] getPositionToGranary(Integer[] prevPosition) {
-        System.out.println(prevPosition[0] + " " + prevPosition[1]);
         Integer[] newPosition = prevPosition.clone();
         
         if (newPosition[0] == -1 && newPosition[1] == -1) {
@@ -235,4 +215,5 @@ public class MPath {
         return positions.values().stream().anyMatch((posTaken) -> 
                 (Arrays.equals(position, posTaken)));
     }
+    
 }
