@@ -108,7 +108,7 @@ public class MGranary {
         }
     }
     
-    public void allCorbsCollected() {
+    public void returnToStoreHouse() {
         rl.lock();
         
         try {

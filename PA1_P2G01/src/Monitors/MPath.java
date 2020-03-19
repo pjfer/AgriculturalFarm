@@ -106,14 +106,14 @@ public class MPath {
             fiController.movePath(id, position);
             farmersWaiting++;
             
-            if (Objects.equals(farmersWaiting, numFarmers)) {
-                farmersWaiting = 0;
-                farmerMoveForward.signal();
+            while (!Objects.equals(farmersWaiting, 0)) {
+                if (Objects.equals(farmersWaiting, numFarmers)) {
+                    farmersWaiting = 0;
+                    farmerMoveForward.signal();
+                }
+                
                 farmerMoveForward.await();
             }
-            
-            while (!Objects.equals(farmersWaiting, 0))
-                farmerMoveForward.await();
         }
         catch (InterruptedException e) {
             System.err.println("ERROR: Farmer was badly interrupted when was "
@@ -142,24 +142,30 @@ public class MPath {
                 positions.put(id, position);
                 fiController.movePath(id, position);
                 Thread.sleep(movementTime);
-                farmerMoveForward.signal();
-                selected = order.peek();
-                order.add(id);
                 
-                while (!Objects.equals(selected, id))
-                    farmerMoveForward.await();
-                
-                order.remove();
+                if (!Objects.equals(farmersWaiting, numFarmers - 1)) {
+                    farmerMoveForward.signal();
+                    selected = order.peek();
+                    order.add(id);
+
+                    while (!Objects.equals(selected, id))
+                        farmerMoveForward.await();
+
+                    order.remove();
+                }
                 
                 return false;
             }
             
             if (!order.isEmpty()) {
+                farmersWaiting++;
                 selected = order.peek();
                 farmerMoveForward.signal();
             }
-            else
+            else {
+                farmersWaiting = 0;
                 positions.clear();
+            }
 
             return true;
         }
