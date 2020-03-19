@@ -34,7 +34,7 @@ public class FIController {
     }
 
     public void movePath(Integer id, Integer[] position) {
-        fiGUI.moveFarmer(id, new Integer[] {position[0], position[1]});
+        fiGUI.moveFarmer(id, new Integer[] {2, position[0], position[1]});
         System.out.println("Farmer: " + id + "moved in path pos: "+position[0] 
                 +" : " + position[1]);
         //Mensagem de movimento no Path.

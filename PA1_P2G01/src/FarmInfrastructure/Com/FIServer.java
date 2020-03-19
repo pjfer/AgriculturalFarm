@@ -25,10 +25,11 @@ public class FIServer {
         this.sa = sa;
     }
     
-    public void prepareFarm(int nf, int to){
+    public void prepareFarm(int nf, int to, int ns){
         gr.prepareSimulation(to);
-        path.prepareSimulation(nf, to);
+        path.prepareSimulation(nf, to, ns);
         sh.prepareSimulation(nf, to);
+        sa.prepareSimulation();
     }
     
     public void startCollection(){

@@ -60,9 +60,6 @@ public class MGranary {
         rl.lock();
         
         try {
-            while (waitingForAllFarmers)
-                farmerEnteringGranary.await();
-            
             Integer position;
             
             do {
@@ -71,6 +68,10 @@ public class MGranary {
             
             positions[position] = 1;
             fiController.moveGranary(id, position);
+            
+            while (waitingForAllFarmers)
+                farmerEnteringGranary.await();
+            
         }
         catch (InterruptedException e) {
             System.err.println("ERROR: Farmer was badly interrupted when "

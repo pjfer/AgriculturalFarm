@@ -14,7 +14,7 @@ public class MStandingArea {
     ReentrantLock rl;
     Condition proceedPath;
     private final int totalFarmers = 5;
-    private final int[] farmersPosition;
+    private int[] farmersPosition;
     
     public MStandingArea(FIController fiController){
         this.fiController = fiController;
@@ -63,6 +63,14 @@ public class MStandingArea {
         }
         farmersPosition[position] = id;
         return position; 
+    }
+    
+    public void prepareSimulation(){
+        proceed = false;
+        farmersPosition = new int[5];
+        for(int i = 0; i < totalFarmers; i ++){
+            farmersPosition[i] = -1;
+        }
     }
     
     

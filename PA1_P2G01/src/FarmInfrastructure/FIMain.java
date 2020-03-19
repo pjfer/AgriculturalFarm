@@ -65,7 +65,7 @@ public class FIMain {
             switch(i){
                 case(0):
                     System.out.println("Preparing Farm");
-                    server.prepareFarm(5, 500);
+                    server.prepareFarm(5, 500, 2);
                     break;
                 case(1):
                     server.startCollection();

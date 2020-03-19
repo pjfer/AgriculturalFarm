@@ -70,7 +70,7 @@ public class MPath {
         this.movementTime = movementTime;
         this.numFarmers = numFarmers;
         this.pathLength = 10;
-        this.numSteps = numSteps;
+        
         this.farmersWaiting = 0;
         this.order = new LinkedList<>();
         this.positions = new HashMap<>();
@@ -79,13 +79,15 @@ public class MPath {
         this.farmerMoveForward = rl.newCondition();
     }
     
-    public void prepareSimulation(int nf, int to) {
+    public void prepareSimulation(int nf, int to, int ns) {
         this.toGranary = true;
         this.numFarmers = nf;
         this.movementTime = to;
         this.farmersWaiting = 0;
         this.order = new LinkedList<>();
         this.positions = new HashMap<>();
+        this.numSteps = ns;
+        this.selected = -1;
     }
     
     public void enterPath(Integer id, boolean toGranary) {
