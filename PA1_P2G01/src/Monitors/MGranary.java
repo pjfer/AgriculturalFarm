@@ -59,6 +59,7 @@ public class MGranary {
 
                 do {
                     position = (int)(Math.random() * numPositions);
+                    System.out.println("stuck");
                 } while (positions[position] == 1);
 
                 positions[position] = 1;
@@ -107,7 +108,7 @@ public class MGranary {
         }
     }
     
-    public void allCorbsCollected() {
+    public void returnToStoreHouse() {
         rl.lock();
         
         try {

@@ -41,7 +41,7 @@ public class FIServer {
     }
     
     public void returnWCorn(){
-        gr.allCorbsCollected();
+        gr.returnToStoreHouse();
     }
     
     public void stopHarvest(){

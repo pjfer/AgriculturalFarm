@@ -35,16 +35,20 @@ public class TFarmer extends Thread{
             path.enterPath(id, true);
             while(!ended_path){
                 ended_path = path.moveForward(id);
+                
             }
+            System.out.println("entering granary");
             granary.enterGranary(id);
             for(int i = 0; i < 10; i++){
                 granary.collectCob();
             }
+            System.out.println("Farmer " + id + ": collected every corn cob!");
+            granary.waitForColleagues();
             path.enterPath(id, false);
             ended_path = false;
             while(!ended_path){
                 ended_path = path.moveForward(id);
-            }     
+            }
             exit = sh.enterSH(id);
             for(int i = 0; i < 10; i++){
                 sh.depositCorn();
