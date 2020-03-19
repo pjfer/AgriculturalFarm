@@ -45,11 +45,17 @@ public class FIServer {
     }
     
     public void stopHarvest(){
-    
+        sa.stopSimulation();
+        path.stopSimulation();
+        gr.stopSimulation();
+        sh.stopSimulation();
     }
     
     public void exitSimulation(){
-    
+        sa.stopSimulation();
+        path.stopSimulation();
+        gr.stopSimulation();
+        sh.exitSimulation();
     }
     
 }
