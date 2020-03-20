@@ -2,9 +2,11 @@ package ControlCenter;
 
 import Communication.HarvestConfig;
 import Communication.HarvestState;
+import Communication.Message;
 import ControlCenter.GraphicalInterface.ControlCenterGUI;
-import ControlCenter.Thread.TFICom;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
@@ -13,35 +15,54 @@ import java.net.Socket;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public class CCController {
-    private Socket socket;
-    private TFICom fiCom;
+    private boolean continueSimulation;
+    private Message msgIn;
+    private Message msgOut;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
     private final ControlCenterGUI ccGUI;
     
-    public CCController() {
+    public CCController(Socket socket) {
+        continueSimulation = true;
         ccGUI = new ControlCenterGUI(this);
         ccGUI.startGUI(ccGUI);
-    }
-    
-    public boolean setupFICom(String host, Integer fiPort) {
+        
         try {
-            socket = new Socket(host, fiPort);
-            
-            return true;
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
         }
         catch (IOException e) {
-            System.err.println("ERROR: Unable to connect to FI server!");
-            
-            return false;
+            System.err.println("ERROR: Unable to create the input/output of "
+                    + "FI server connection!");
+            System.exit(1);
         }
+    }
+    
+    public boolean continueSimulation() {
+        return continueSimulation;
+    }
+    
+    public void updateGUITextArea(String text) {
+        ccGUI.updateTextArea(text);
     }
     
     public void prepareHarvest(Integer numCornCobs, Integer numFarmers, 
             Integer maxSteps, Integer timeout) {
+        continueSimulation = true;
         HarvestConfig hc = new HarvestConfig(numCornCobs, numFarmers, 
                 maxSteps, timeout);
-        fiCom = new TFICom(socket);
-        fiCom.setHarvestConfig(hc);
-        fiCom.setHarvestState(HarvestState.Initial);
+        String msgBody = hc.toString();
+        msgOut = new Message(msgBody, HarvestState.Prepare);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     }
     
     public void prepComplete() {
@@ -49,8 +70,18 @@ public class CCController {
     }
 
     public void startHarvest() {
-        fiCom = new TFICom(socket);
-        fiCom.setHarvestState(HarvestState.Prepare);
+        String msgBody = "Start the harvest";
+        msgOut = new Message(msgBody, HarvestState.Start);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     }
     
     public void readyToCollect() {
@@ -58,8 +89,18 @@ public class CCController {
     }
 
     public void startCollecting() {
-        fiCom = new TFICom(socket);
-        fiCom.setHarvestState(HarvestState.Collect);
+        String msgBody = "Collect the corn cobs";
+        msgOut = new Message(msgBody, HarvestState.Collect);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     }
     
     public void readyToReturn() {
@@ -67,13 +108,33 @@ public class CCController {
     }
 
     public void returnHarvest() {
-        fiCom = new TFICom(socket);
-        fiCom.setHarvestState(HarvestState.Return);
+        String msgBody = "Return with the corn cobs";
+        msgOut = new Message(msgBody, HarvestState.Return);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     }
 
     public void stop() {
-        fiCom = new TFICom(socket);
-        fiCom.setHarvestState(HarvestState.Stop);
+        String msgBody = "Stop the harvest";
+        msgOut = new Message(msgBody, HarvestState.Stop);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     }
     
     public void fiStopped() {
@@ -81,11 +142,22 @@ public class CCController {
     }
 
     public void exit() {
-        fiCom = new TFICom(socket);
-        fiCom.setHarvestState(HarvestState.Exit);
+        String msgBody = "End simulation";
+        msgOut = new Message(msgBody, HarvestState.Exit);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     }
     
     public void fiExited() {
         ccGUI.fiExited();
+        continueSimulation = false;
     }
 }

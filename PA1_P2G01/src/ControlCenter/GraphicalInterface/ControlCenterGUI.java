@@ -26,6 +26,10 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         this.ccController = ccController;
     }
     
+    public void updateTextArea(String text) {
+        jTextArea1.append(text);
+    }
+    
     public void prepComplete() {
         jButton2.setEnabled(true);
     }

@@ -1,8 +1,8 @@
 package ControlCenter.Thread;
 
 import Communication.Message;
-import Communication.HarvestConfig;
 import Communication.HarvestState;
+import ControlCenter.CCController;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,8 +14,11 @@ import java.net.Socket;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public class TFICom extends Thread {
+    private Message msgIn;
+    private Message msgOut;
+    private String msgBody;
     private Socket clientSocket;
-    private HarvestConfig hc;
+    private CCController ccController;
     private HarvestState hvState;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -24,82 +27,67 @@ public class TFICom extends Thread {
         super();
     }
     
-    public TFICom(Socket clientSocket) {
+    public TFICom(Socket clientSocket, CCController ccController) {
         this.clientSocket = clientSocket;
-    }
-    
-    public void setHarvestConfig(HarvestConfig hc) {
-        this.hc = hc;
-    }
-    
-    public void setHarvestState(HarvestState hvState) {
-        this.hvState = hvState;
+        this.ccController = ccController;
+        this.msgBody = "200 OK";
     }
     
     @Override
     public void run() {
-        Message message;
-        String body;
-        
         try {
             in = new ObjectInputStream(clientSocket.getInputStream());
             out = new ObjectOutputStream(clientSocket.getOutputStream());
+            msgIn = (Message) in.readObject();
+            hvState = msgIn.getType();
             
             switch (hvState) {
-                case Initial:
-                    body = hc.toString();
-                    message = new Message(body, hvState, getId());
-                    break;
                 case Prepare:
-                    body = "Start the harvest";
-                    message = new Message(body, hvState, getId());
+                    ccController.updateGUITextArea(msgIn.getBody());
+                    ccController.prepComplete();
+                    msgOut = new Message(msgBody, hvState);
                     break;
                 case Walk:
-                    body = "Waiting for all farmers to reach the Granary";
-                    message = new Message(body, hvState, getId());
+                    ccController.updateGUITextArea(msgIn.getBody());
+                    msgOut = new Message(msgBody, hvState);
                     break;
                 case WaitToCollect:
-                    body = "Waiting for all farmers to reach the Granary";
-                    message = new Message(body, hvState, getId());
-                    break;
-                case Collect:
-                    body = "Collect the corn cobs";
-                    message = new Message(body, hvState, getId());
+                    ccController.updateGUITextArea(msgIn.getBody());
+                    ccController.readyToCollect();
+                    msgOut = new Message(msgBody, hvState);
                     break;
                 case WaitToReturn:
-                    body = "Waiting for all farmers to collect";
-                    message = new Message(body, hvState, getId());
-                    break;
-                case Return:
-                    body = "Return with the corn cobs";
-                    message = new Message(body, hvState, getId());
+                    ccController.updateGUITextArea(msgIn.getBody());
+                    ccController.readyToReturn();
+                    msgOut = new Message(msgBody, hvState);
                     break;
                 case Store:
-                    body = "Waiting for all farmers to deliver the cobs";
-                    message = new Message(body, hvState, getId());
+                    ccController.updateGUITextArea(msgIn.getBody());
+                    msgOut = new Message(msgBody, hvState);
                     break;
                 case Stop:
-                    body = "Stop the harvest";
-                    message = new Message(body, hvState, getId());
+                    ccController.updateGUITextArea(msgIn.getBody());
+                    msgOut = new Message(msgBody, hvState);
+                    ccController.fiStopped();
                     break;
                 case Exit:
-                    body = "Exit simulation";
-                    message = new Message(body, hvState, getId());
+                    ccController.updateGUITextArea(msgIn.getBody());
+                    ccController.fiExited();
+                    msgOut = new Message(msgBody, hvState);
                     break;
                 default:
-                    body = "Nothing to do";
-                    message = new Message(body, hvState, getId());
-                    break;
+                    System.err.println("ERROR: Unable to recognize the given"
+                            + "harvest state!");
+                    System.exit(1);
             }
             
-            out.writeObject(message);
+            out.writeObject(msgOut);
             out.flush();
-            Message response = (Message) in.readObject();
-            System.out.println("Server's message: " + response.getBody());
         }
         catch(IOException | ClassNotFoundException e) {
-            System.err.println("ERROR: Unable to read the message from client "
+            System.err.println("ERROR: Unable to read the msgOut from client "
                     + "socket on port " + clientSocket.getPort());
+            System.exit(1);
         }
         
         try {
@@ -110,6 +98,7 @@ public class TFICom extends Thread {
         catch(IOException e) {
             System.err.println("ERROR: Unable to close the connection of " + 
                     clientSocket);
+            System.exit(1);
         }
     }
 }
