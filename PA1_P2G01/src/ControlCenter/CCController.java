@@ -41,7 +41,7 @@ public class CCController {
                 maxSteps, timeout);
         fiCom = new TFICom(socket);
         fiCom.setHarvestConfig(hc);
-        fiCom.setHarvestState(HarvestState.Initial);
+        fiCom.setHarvestState(HarvestState.Prepare);
     }
     
     public void prepComplete() {
@@ -50,7 +50,7 @@ public class CCController {
 
     public void startHarvest() {
         fiCom = new TFICom(socket);
-        fiCom.setHarvestState(HarvestState.Prepare);
+        fiCom.setHarvestState(HarvestState.Start);
     }
     
     public void readyToCollect() {

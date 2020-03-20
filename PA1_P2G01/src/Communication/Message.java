@@ -14,7 +14,7 @@ public class Message implements Serializable {
     
     public Message() {
         body = "";
-        type = HarvestState.Initial;
+        type = HarvestState.Prepare;
         farmerID = -1L;
     }
     

@@ -46,11 +46,11 @@ public class TFICom extends Thread {
             out = new ObjectOutputStream(clientSocket.getOutputStream());
             
             switch (hvState) {
-                case Initial:
+                case Prepare:
                     body = hc.toString();
                     message = new Message(body, hvState, getId());
                     break;
-                case Prepare:
+                case Start:
                     body = "Start the harvest";
                     message = new Message(body, hvState, getId());
                     break;
