@@ -1,4 +1,4 @@
-package ControlCenter;
+package Communication;
 
 /**
  * Enumerate which contains all the possible states of the harvest.

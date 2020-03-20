@@ -1,6 +1,5 @@
 package Communication;
 
-import ControlCenter.HarvestState;
 import java.io.Serializable;
 
 /**

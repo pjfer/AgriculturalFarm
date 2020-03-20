@@ -1,4 +1,4 @@
-package ControlCenter;
+package Communication;
 
 /**
  * Class where is defined all the chosen configurations for the harvest.
@@ -6,21 +6,32 @@ package ControlCenter;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public class HarvestConfig {
+    private Integer numCornCobs;
     private Integer numFarmers;
     private Integer numMaxSteps;
     private Integer timeoutPath;
     
     public HarvestConfig() {
+        this.numCornCobs = 10;
         this.numFarmers = 5;
         this.numMaxSteps = 1;
         this.timeoutPath = 250;
     }
     
-    public HarvestConfig(Integer numFarmers, Integer numMaxSteps, 
-            Integer timeoutPath) {
+    public HarvestConfig(Integer numCornCobs, Integer numFarmers, 
+            Integer numMaxSteps, Integer timeoutPath) {
+        this.numCornCobs = numCornCobs;
         this.numFarmers = numFarmers;
         this.numMaxSteps = numMaxSteps;
         this.timeoutPath = timeoutPath;
+    }
+    
+    public void setNumCornCobs(Integer numCornCobs) {
+        this.numCornCobs = numCornCobs;
+    }
+    
+    public Integer getNumCornCobs() {
+        return this.numCornCobs;
     }
     
     public void setNumFarmers(Integer numFarmers) {
@@ -45,5 +56,13 @@ public class HarvestConfig {
     
     public Integer getTimeoutPath() {
         return this.timeoutPath;
+    }
+    
+    @Override
+    public String toString() {
+        return "{numCornCobs: " + numCornCobs +
+                ", numFarmers: " + numFarmers + 
+                ", numMaxSteps: " + numMaxSteps +
+                ", timeoutPath: " + timeoutPath + "}";
     }
 }

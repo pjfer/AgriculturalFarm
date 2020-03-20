@@ -1,77 +1,88 @@
 package ControlCenter;
 
+import Communication.Message;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
 /**
- * Class responsible for initializing the server and the communication between 
- * the servers, which also works as the main class for the control centre.
+ * Class responsible for initializing the Control Center server.
+ * This server communicates with the Farm Infrastructure client, with the goal
+ * of reading all its messages.
  * 
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public class CCServer {
-    public static void main(String[] args) {
-        String host = "127.0.0.1";
-        Integer ccPort = 1234;
-        Integer fiPort = 1235;
-        Scanner sc = new Scanner(System.in);
-        Boolean stayConnected = true;
-        Socket ccTofiSocket = null;
-        ServerSocket fiToccSocket = null;
-        
-        System.out.println("Introduza o número de agricultores:");
-        Integer numFarmers = sc.nextInt();
-        
-        System.out.println("Introduza o número máximo de passos:");
-        Integer numMaxSteps = sc.nextInt();
-        
-        System.out.println("Introduza o timeout dentro do Path:");
-        Integer timeoutPath = sc.nextInt();
-        
-        HarvestConfig hc = new HarvestConfig(numFarmers, numMaxSteps, 
-                timeoutPath);
-        
+    private final Integer port;
+    private ServerSocket socket;
+    private Socket clientSocket;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    
+    public CCServer(Integer port) {
+        this.port = port;
+    }
+    
+    public boolean start() {
         try {
-            fiToccSocket = new ServerSocket(ccPort);
-            System.out.println("CC server listening to port " + ccPort);
-        }
-        catch(IOException e) {
-            System.err.println("ERROR: Server Socket " + ccPort + 
-                    " is already in use!");
-            System.exit(1);
-        }
-        
-        while(stayConnected) {
-            try {
-                ccTofiSocket = new Socket(host, fiPort);
-                ClientThread clientThread = new ClientThread(ccTofiSocket, hc);
-                clientThread.start();
-            } catch(IOException e) {
-                System.err.println("ERROR: Unable to connect to FI server!");
-            }
+            socket = new ServerSocket(port);
+            System.out.println("CC server listening to port " + port);
             
-            try {
-                Socket clientSocket = fiToccSocket.accept();
-                ClientThread clientThread = new ClientThread(clientSocket, hc);
-                clientThread.start();
-            }
-            catch(IOException e) {
-                System.err.println("ERROR: Unable to accept the client's " + 
-                        "request!");
-            }
-        }
-        
-        try {
-            fiToccSocket.close();
-            ccTofiSocket.close();
-            System.out.println("Server closed on socket " + ccPort);
+            return true;
         }
         catch(IOException e) {
-            System.err.println("ERROR: Unable to close the Server Socket " + 
-                    ccPort);
-            System.exit(1);
+            System.err.println("ERROR: Port " + port + " is already in use!");
+            
+            return false;
+        }
+    }
+    
+    public boolean close() {
+        try {
+            in.close();
+            out.close();
+            socket.close();
+            System.out.println("Server closed on port " + port);
+            
+            return true;
+        }
+        catch(IOException e) {
+            System.err.println("ERROR: Unable to close the server on port " + 
+                    port);
+            
+            return false;
+        }
+    }
+    
+    public Message readMessage() {
+        try {
+            clientSocket = socket.accept();
+            in = new ObjectInputStream(clientSocket.getInputStream());
+            
+            return (Message) in.readObject();
+        }
+        catch (IOException | ClassNotFoundException e) {
+            System.err.println("ERROR: Unable to read the client's " + 
+                    "message!");
+            
+            return null;
+        }
+    }
+    
+    public boolean sendResponse(String response) {
+        try {
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
+            out.writeObject(response);
+            out.flush();
+            
+            return true;
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send a response! ");
+            
+            return false;
         }
     }
 }
