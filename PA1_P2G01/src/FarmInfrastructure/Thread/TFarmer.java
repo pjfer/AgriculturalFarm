@@ -40,7 +40,7 @@ public class TFarmer extends Thread{
             System.out.println("entering granary");
             granary.enterGranary(id);
             for(int i = 0; i < 10; i++){
-                granary.collectCob();
+                granary.collectCob(id);
             }
             System.out.println("Farmer " + id + ": collected every corn cob!");
             granary.waitForColleagues();
@@ -51,7 +51,7 @@ public class TFarmer extends Thread{
             }
             exit = sh.enterSH(id);
             for(int i = 0; i < 10; i++){
-                sh.depositCorn();
+                sh.depositCorn(id);
             }
             ended_path = false;
         }

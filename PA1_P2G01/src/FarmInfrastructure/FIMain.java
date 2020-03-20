@@ -1,7 +1,6 @@
 package FarmInfrastructure;
 
-import Communication.HarvestState;
-import Communication.Message;
+import FarmInfrastructure.Com.CcStub;
 import FarmInfrastructure.Com.FIServer;
 import FarmInfrastructure.GUI.FarmInfGUI;
 import FarmInfrastructure.Thread.TFarmer;
@@ -9,7 +8,6 @@ import Monitors.MGranary;
 import Monitors.MPath;
 import Monitors.MStandingArea;
 import Monitors.MStoreHouse;
-import java.util.Scanner; 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,8 +15,72 @@ public class FIMain {
     
     public static void main(String[] args){
         
+        /**
+         * Farm interface, responsible for showing graphically the state
+         * of the farm.
+         */
+        
         FarmInfGUI fiGUI = new FarmInfGUI();
         
+        /**
+         * IP of the host server for the Control Center.
+         */
+        String host = "127.0.0.1";
+        
+        /**
+         * Port of the host server for the Control Center.
+         */
+        Integer ccPort = 1234;
+        
+        /**
+         * Interface to communicate with the Control Center.
+         */
+        CcStub cc = new CcStub(host, ccPort);
+        
+        /**
+         * Interface that controls the actual farm.
+         */
+        FIController fiController = new FIController(fiGUI, cc);
+        
+        /**
+         * Monitor of the Granary Area.
+         */
+        MGranary gr = new MGranary(fiController);
+        
+        /**
+         * Monitor of the Path Area.
+         */
+        MPath path = new MPath(fiController);
+        
+        /**
+         * Monitor of the Store House Area.
+         */
+        MStoreHouse sh = new MStoreHouse(fiController);
+        
+        /**
+         * Monitor of the Standing Area.
+         */
+        MStandingArea sa = new MStandingArea(fiController);
+        
+        /**
+         *  Port for the Farm Interface Server.
+         */
+        Integer fiPort = 1235;
+        
+        /**
+         * Farm Interface Server responsible to process the messages from the
+         * Control Center.
+         */
+        FIServer fiServer = new FIServer(fiPort, fiController);
+        
+        /*
+            Set the monitors so the controller can use them.
+        */
+        fiController.setGr(gr);
+        fiController.setPath(path);
+        fiController.setSa(sa);
+        fiController.setSh(sh);
+        fiController.setFiServer(fiServer);
         
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code ">
@@ -50,74 +112,48 @@ public class FIMain {
             }
         });
         
-        FIController fiController = new FIController(fiGUI);
-        MGranary gr = new MGranary(fiController);
-        MPath path = new MPath(fiController);
-        MStoreHouse sh = new MStoreHouse(fiController);
-        MStandingArea sa = new MStandingArea(fiController);
-        
-        fiController.setGr(gr);
-        fiController.setPath(path);
-        fiController.setSa(sa);
-        fiController.setSh(sh);
-        
-        
+        /*
+            Create farmer threads.
+        */
         Thread threads[] = new Thread[5];
         for(int i = 1; i <= 5; i++){
             threads[i-1] = new TFarmer(i, gr, path, sh, sa);
             threads[i-1].start();
         }
-        Scanner scan = new Scanner(System.in);
         
-        HarvestState hs;
-        Message msgReceived;
-        String host = "127.0.0.1";
-        Integer ccPort = 1234;
-        Integer fiPort = 1235;
-        
-        FIServer fiServer = new FIServer(fiPort);
-        
+        /*
+            Start the server.
+        */
         if (!fiServer.start())
             System.exit(1);
         
+        /*
+            Wait for messages until it receives the die signal.
+        */
         do {
-            msgReceived = fiServer.readMessage();
-            hs = msgReceived.getType();
-            switch(hs){
-                case Prepare:
-                    System.out.println("Preparing Farm");
-                    fiController.prepareFarm(5, 500, 1);
-                    break;
-                case Start:
-                    fiController.startCollection();
-                    break;
-                case Collect:
-                    fiController.collectCorn();
-                    break;
-                case Return:
-                    fiController.returnWCorn();
-                    break;
-                case Stop:
-                    fiController.stopHarvest();
-                    break;
-                case Exit:
-                    fiController.exitSimulation();
-                    break;
-            }
-        } while(hs != HarvestState.Exit && hs != null);
+            fiServer.newConnection();
+        } while(!fiServer.isClosed());
         
-        
+        /*
+            Wait for all the farmers to die.
+        */
         for(int i = 0; i < 5; i++){
             try {
                 threads[i].join();
+                /*
+                    Send message that all farmer threads were terminated were killed.
+                */
+                fiController.farmerTerminated(i+1);
+                
                 System.out.println("Farmer "+(i+1)+ " has died");
             } catch (InterruptedException ex) {
                 Logger.getLogger(FIMain.class.getName()).log(Level.SEVERE, null, ex);
             } 
         }
+        /*
+            Delete the graphical interface.
+        */
         fiGUI.dispose();
-        if (!fiServer.close())
-            System.exit(1);
     
     }
     

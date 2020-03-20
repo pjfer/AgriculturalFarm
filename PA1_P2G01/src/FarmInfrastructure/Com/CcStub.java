@@ -8,14 +8,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 public class CcStub {
     
     private Socket clientSocket;
     private HarvestConfig hc;
-
+    private Message msgIn;
+    private Message msgOut;
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private final String host;
@@ -28,43 +28,94 @@ public class CcStub {
     }
     
     public void farmersReady(){
-        Message message;
-        String body;
+        
+        String msgBody = "All Farmers are waiting in the Store House";
+        msgOut = new Message(msgBody, HarvestState.WaitToStart);
         
         try {
-            clientSocket = new Socket(host, ccPort);
-            in = new ObjectInputStream(clientSocket.getInputStream()); 
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            
-            message = new Message(HarvestState.WaitToWalk);
-            
-            out.writeObject(message);
+            out.writeObject(msgOut);
             out.flush();
-            Message response = (Message) in.readObject();
-            System.out.println("Server's message: " + response.getBody());
-            
-            in.close();
-            out.close();
-            clientSocket.close();
-            
-        } catch (IOException ex) {
-            Logger.getLogger(CcStub.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(CcStub.class.getName()).log(Level.SEVERE, null, ex);
-        }    
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }   
+    }
+    
+    public void farmersPrepared(){
+        String msgBody = "All Farmers are waiting in the Standing Area";
+        msgOut = new Message(msgBody, HarvestState.WaitToWalk);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     }
     
     public void farmersWCollect(){
+        String msgBody = "All Farmers are waiting in the Granary";
+        msgOut = new Message(msgBody, HarvestState.WaitToCollect);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     
     }
     
     public void farmersWProceed(){
-    
+        String msgBody = "All Farmers are waiting to Return";
+        msgOut = new Message(msgBody, HarvestState.WaitToReturn);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
     }
 
-
-
-
-
+    public void update(String update){
+        msgOut = new Message(update, HarvestState.Update);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
+    }
+    
+    public void farmerTerminated(int farmerId){
+        msgOut = new Message("Farmer: " + farmerId + "has terminated.",
+                HarvestState.FarmerTerminated);
+        
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: Unable to send the message to the "
+                    + "FI server");
+            System.exit(1);
+        }
+    }
     
 }

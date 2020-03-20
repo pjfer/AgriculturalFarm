@@ -1,5 +1,7 @@
 package FarmInfrastructure;
 
+import FarmInfrastructure.Com.CcStub;
+import FarmInfrastructure.Com.FIServer;
 import FarmInfrastructure.GUI.FarmInfGUI;
 import Monitors.MGranary;
 import Monitors.MPath;
@@ -19,21 +21,28 @@ public class FIController {
     private MGranary gr;
     private MPath path;
     private MStandingArea sa;
+    private CcStub cc;
+    private FIServer fiServer;
+    private int counter;
+    private int nFarmers;
+    
+    public FIController() {
+    }
     
     public FIController(FarmInfGUI fiGUI, MGranary gr, 
-            MPath path, MStandingArea sa, MStoreHouse sh){
+            MPath path, MStandingArea sa, MStoreHouse sh, CcStub cc){
         
         this.fiGUI = fiGUI;
         this.sh = sh;
         this.gr = gr;
         this.path = path;
         this.sa = sa;
+        this.cc = cc;
         
     }
-    public FIController(FarmInfGUI fiGUI){
-        
+    public FIController(FarmInfGUI fiGUI, CcStub cc){
         this.fiGUI = fiGUI;
-        
+        this.cc = cc;
     }
 
     public void setSh(MStoreHouse sh) {
@@ -44,7 +53,6 @@ public class FIController {
         this.gr = gr;
     }
 
-
     public void setPath(MPath path) {
         this.path = path;
     }
@@ -53,50 +61,101 @@ public class FIController {
         this.sa = sa;
     }
     
-    
-    
-    public void farmerAwaiting(int id) {
-        System.out.println("Farmer: " + id + " awaiting.");
-        //Mandar mensagem para CC a confirmar que está à espera.
+    public void setFiServer(FIServer fiServer){
+        this.fiServer = fiServer;
     }
-
+    
     public void farmerEnterSH(int id, int position) {
         fiGUI.moveFarmer(id, new Integer[] {0, position});
-        System.out.println("Farmer: " + id + "entered sh in pos: "+position);
-        //Mandar mensagem para CC a confirmar a entrada.
+        System.out.println("Farmer: " + id 
+                + " entered in the Store House in position: " + position);
+        
+        cc.update("Farmer: " + id 
+                + " entered in the Store House in position: " + position);
+    }
+    
+    public void farmerAwaiting(int id) {
+        System.out.println("Farmer: " + id + "is awaiting in the SH.");
+        cc.update("Farmer: " + id + " is awaiting in the Store House.");
+        counter ++;
+        
+        if(counter == nFarmers){
+            cc.farmersReady();
+            System.out.println("All farmers Awaiting");
+            counter = 0;
+        }       
     }
 
     public void farmerStanding(int id, int position) {
         fiGUI.moveFarmer(id, new Integer[] {1, position});
-        System.out.println("Farmer: " + id + "entered sa in pos: "+position);
-        //Mensagem de Entrada na Standing Area.
+        System.out.println("Farmer: " + id + " entered the Standing Area in the position: " + (position + 1));
+        cc.update("Farmer: " + id + " entered the Standing Area in the position: " + (position + 1));
+        
+        counter ++;
+        
+        if(counter == nFarmers){
+            System.out.println("All Farmers entered the Standing Area");
+            cc.farmersPrepared();
+            counter = 0;
+        }
     }
 
     public void movePath(Integer id, Integer[] position) {
         fiGUI.moveFarmer(id, new Integer[] {2, position[0], position[1]});
-        System.out.println("Farmer: " + id + "moved in path pos: "+position[0] 
-                +" : " + position[1]);
-        //Mensagem de movimento no Path.
+        System.out.println("Farmer: " + id + " moved in Path to the position: " 
+                + position[0] + " : "+ position[1]);
+        
+        cc.update("Farmer: " + id + " moved in Path to the position: " 
+                + position[0] + " : "+ position[1]);
     }
 
     public void moveGranary(Integer id, Integer position) {
         fiGUI.moveFarmer(id, new Integer[] {3, position});
-        System.out.println("Farmer: " + id + "entered granary in pos: "+ position);
-        //Mensagem de entrada no Granary.
+        System.out.println("Farmer: " + id + " entered the Granary in the position: "+ position);
+        cc.update("Farmer: " + id + " entered the Granary in the position: "+ position);
+        counter ++;
+        
+        if(counter == nFarmers){
+            System.out.println("All Farmers entered the Granary");
+            cc.farmersWCollect();
+            counter = 0;
+        }
+    }
+    
+    public void collectCorn(Integer id){
+        System.out.println("Farmer: " + id + " colected one cobs.");
+        cc.update("Farmer: " + id + " colected one corn.");
+    }
+    
+    public void storeCorn(Integer id) {
+        System.out.println("Farmer: " + id + " stored one cobs.");
+        cc.update("Farmer: " + id + " stored one corn.");
+    }
+    
+    public void farmerTerminated(int farmerId) {
+        cc.farmerTerminated(farmerId);
     }
     
     public void prepareFarm(int nf, int to, int ns){
+        System.out.println("Preparing Farm");
+       
+        nFarmers = nf;
+        counter = 0;
         gr.prepareSimulation(to);
         path.prepareSimulation(nf, to, ns);
-        sh.prepareSimulation(nf, to);
         sa.prepareSimulation();
+        
+        System.out.println("Farmers Proceed to Standing Area");
+        sh.prepareSimulation(nf, to);
+        
     }
     
-    public void startCollection(){
+    public void startMove(){
+        System.out.println("Farmers proceeded to Path");
         sa.proceedToPath();
     }
     
-    public void collectCorn(){
+    public void startCollection(){
         gr.allFarmersInGranary();
     }
     
@@ -116,6 +175,7 @@ public class FIController {
         path.stopSimulation();
         gr.stopSimulation();
         sh.exitSimulation();
+        fiServer.close();
     }
     
 }

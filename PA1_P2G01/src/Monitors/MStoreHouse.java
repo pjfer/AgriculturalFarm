@@ -89,10 +89,11 @@ public class MStoreHouse {
         return this.exitSimulation;
     }
     
-    public synchronized void depositCorn(){
+    public synchronized void depositCorn(Integer farmerId){
         try {
             if(!stopSimulation){
                 Thread.sleep(depositDurantion);
+                fiController.storeCorn(farmerId);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(MStoreHouse.class.getName()).log(Level.SEVERE, null, ex);

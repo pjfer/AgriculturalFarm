@@ -79,10 +79,11 @@ public class MGranary {
         }
     }
     
-    public synchronized void collectCob() {
+    public synchronized void collectCob(int farmerId) {
         try {
             if(!stopSimulation){
                 Thread.sleep(collectDuration);
+                fiController.collectCorn(farmerId);
             }
         }
         catch (InterruptedException e) {

@@ -1,6 +1,7 @@
 package FarmInfrastructure.Com;
 
-import Communication.Message;
+import FarmInfrastructure.FIController;
+import FarmInfrastructure.Thread.TCCCom;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -19,16 +20,20 @@ public class FIServer {
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    private final FIController fiController;
+    private TCCCom ccCom;
+    private boolean closed;
     
-    public FIServer(Integer port){
+    public FIServer(Integer port, FIController fiController){
         this.port = port;
+        this.fiController = fiController;
     }
     
     public boolean start() {
         try {
             socket = new ServerSocket(port);
             System.out.println("FI server listening to port " + port);
-            
+            closed = false;
             return true;
         }
         catch(IOException e) {
@@ -44,7 +49,7 @@ public class FIServer {
             out.close();
             socket.close();
             System.out.println("Server closed on port " + port);
-            
+            closed = true;
             return true;
         }
         catch(IOException e) {
@@ -53,38 +58,25 @@ public class FIServer {
             
             return false;
         }
+        
     }
     
-    public Message readMessage() {
+    public void newConnection(){
         try {
             clientSocket = socket.accept();
-            in = new ObjectInputStream(clientSocket.getInputStream());
-            
-            return (Message) in.readObject();
-        }
-        catch (IOException | ClassNotFoundException e) {
-            System.err.println("ERROR: Unable to read the client's " + 
-                    "message!");
-            
-            return null;
-        }
-    }
-    
-    public boolean sendResponse(String response) {
-        try {
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            out.writeObject(response);
-            out.flush();
-            
-            return true;
+            ccCom = new TCCCom(clientSocket, fiController);
+            ccCom.start();
         }
         catch (IOException e) {
-            System.err.println("ERROR: Unable to send a response! ");
-            
-            return false;
+            System.err.println("ERROR: Unable to read the client's " + 
+                    "message!");
+            System.exit(1);
         }
+    }  
+
+    public boolean isClosed() {
+        return closed;
     }
     
-
     
 }
