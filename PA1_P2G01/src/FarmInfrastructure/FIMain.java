@@ -1,5 +1,7 @@
 package FarmInfrastructure;
 
+import Communication.HarvestState;
+import Communication.Message;
 import FarmInfrastructure.Com.FIServer;
 import FarmInfrastructure.GUI.FarmInfGUI;
 import FarmInfrastructure.Thread.TFarmer;
@@ -19,7 +21,7 @@ public class FIMain {
         
         
         /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
@@ -54,6 +56,12 @@ public class FIMain {
         MStoreHouse sh = new MStoreHouse(fiController);
         MStandingArea sa = new MStandingArea(fiController);
         
+        fiController.setGr(gr);
+        fiController.setPath(path);
+        fiController.setSa(sa);
+        fiController.setSh(sh);
+        
+        
         Thread threads[] = new Thread[5];
         for(int i = 1; i <= 5; i++){
             threads[i-1] = new TFarmer(i, gr, path, sh, sa);
@@ -61,33 +69,44 @@ public class FIMain {
         }
         Scanner scan = new Scanner(System.in);
         
-        FIServer server = new FIServer(gr, path, sa, sh);
-        boolean exit = false;
-        while(!exit){
-            int i = scan.nextInt();
-            switch(i){
-                case(0):
+        HarvestState hs;
+        Message msgReceived;
+        String host = "127.0.0.1";
+        Integer ccPort = 1234;
+        Integer fiPort = 1235;
+        
+        FIServer fiServer = new FIServer(fiPort);
+        
+        if (!fiServer.start())
+            System.exit(1);
+        
+        do {
+            msgReceived = fiServer.readMessage();
+            hs = msgReceived.getType();
+            switch(hs){
+                case Prepare:
                     System.out.println("Preparing Farm");
-                    server.prepareFarm(5, 500, 1);
+                    fiController.prepareFarm(5, 500, 1);
                     break;
-                case(1):
-                    server.startCollection();
+                case Start:
+                    fiController.startCollection();
                     break;
-                case(2):
-                    server.collectCorn();
+                case Collect:
+                    fiController.collectCorn();
                     break;
-                case(3):
-                    server.returnWCorn();
+                case Return:
+                    fiController.returnWCorn();
                     break;
-                case(4):
-                    server.stopHarvest();
+                case Stop:
+                    fiController.stopHarvest();
                     break;
-                case(5):
-                    server.exitSimulation();
-                    exit = true;
+                case Exit:
+                    fiController.exitSimulation();
                     break;
             }
-        }
+        } while(hs != HarvestState.Exit && hs != null);
+        
+        
         for(int i = 0; i < 5; i++){
             try {
                 threads[i].join();
@@ -97,7 +116,8 @@ public class FIMain {
             } 
         }
         fiGUI.dispose();
-    
+        if (!fiServer.close())
+            System.exit(1);
     
     }
     

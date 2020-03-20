@@ -1,6 +1,6 @@
 package ControlCenter;
 
-import Communication.Message;
+import ControlCenter.Thread.TFICom;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,6 +20,7 @@ public class CCServer {
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    private TFICom fiCom;
     
     public CCServer(Integer port) {
         this.port = port;
@@ -56,33 +57,16 @@ public class CCServer {
         }
     }
     
-    public Message readMessage() {
+    public void newConnection(CCController ccController) {
         try {
             clientSocket = socket.accept();
-            in = new ObjectInputStream(clientSocket.getInputStream());
-            
-            return (Message) in.readObject();
-        }
-        catch (IOException | ClassNotFoundException e) {
-            System.err.println("ERROR: Unable to read the client's " + 
-                    "message!");
-            
-            return null;
-        }
-    }
-    
-    public boolean sendResponse(String response) {
-        try {
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            out.writeObject(response);
-            out.flush();
-            
-            return true;
+            fiCom = new TFICom(clientSocket, ccController);
+            fiCom.start();
         }
         catch (IOException e) {
-            System.err.println("ERROR: Unable to send a response! ");
-            
-            return false;
+            System.err.println("ERROR: Unable to read the client's " + 
+                    "message!");
+            System.exit(1);
         }
     }
 }

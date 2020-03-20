@@ -8,4 +8,5 @@ package Communication;
 public enum HarvestState {
     Prepare, Start, WaitToWalk,  Walking, WaitToCollect, Collect, WaitToReturn, Return, Store,
     Stop, Exit
+
 }

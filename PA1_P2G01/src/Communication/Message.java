@@ -30,6 +30,11 @@ public class Message implements Serializable {
         this.farmerID = farmerID;
     }
     
+    public Message(String body, HarvestState type) {
+        this.body = body;
+        this.type = type;
+    }
+    
     public Message(String body, HarvestState type, Long farmerID) {
         this.body = body;
         this.type = type;
