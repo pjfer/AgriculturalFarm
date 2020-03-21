@@ -18,16 +18,15 @@ public class ControlCenterGUI extends javax.swing.JFrame {
      */
     public ControlCenterGUI(CCController ccController) {
         initComponents();
-        jButton2.setEnabled(false);
-        jButton3.setEnabled(false);
-        jButton4.setEnabled(false);
-        jButton5.setEnabled(false);
-        jButton6.setEnabled(false);
         this.ccController = ccController;
     }
     
     public void updateTextArea(String text) {
         jTextArea1.append(text);
+    }
+    
+    public void readyToPrep() {
+        jButton1.setEnabled(true);
     }
     
     public void prepComplete() {
@@ -47,7 +46,6 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         jTextField2.setEnabled(true);
         jTextField3.setEnabled(true);
         jTextField4.setEnabled(true);
-        jButton1.setEnabled(true);
     }
     
     public void fiExited() {
@@ -55,7 +53,6 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         jTextField2.setEnabled(true);
         jTextField3.setEnabled(true);
         jTextField4.setEnabled(true);
-        jButton1.setEnabled(true);
     }
 
     /**
@@ -99,6 +96,7 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         jLabel4.setText("Timeout:");
 
         jButton1.setText("Prepare");
+        jButton1.setEnabled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -106,6 +104,7 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         });
 
         jButton2.setText("Start");
+        jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -113,6 +112,7 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         });
 
         jButton3.setText("Collect");
+        jButton3.setEnabled(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -120,6 +120,7 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         });
 
         jButton4.setText("Return");
+        jButton4.setEnabled(false);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -127,6 +128,7 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         });
 
         jButton5.setText("Stop");
+        jButton5.setEnabled(false);
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -134,6 +136,7 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         });
 
         jButton6.setText("Exit");
+        jButton6.setEnabled(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
@@ -268,12 +271,12 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         Integer maxSteps = getIntegerValue(jTextField3.getText());
         Integer timeout = getIntegerValue(jTextField4.getText());
         
-        if (numCornCobs == -1 || numCornCobs > 10) {
+        if (numCornCobs < 1 || numCornCobs > 10) {
             JOptionPane.showMessageDialog(new JPanel(), 
                     "Number of corn cobs must be equal or lower to 10!", 
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
-        else if ( numFarmers != 2 && numFarmers != 5) {
+        else if (numFarmers != 2 && numFarmers != 5) {
             JOptionPane.showMessageDialog(new JPanel(), 
                     "Number of farmers must be equal to 2 or 5!", 
                     "Error", JOptionPane.ERROR_MESSAGE);

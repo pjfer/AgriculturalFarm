@@ -168,9 +168,6 @@ public class CcStub {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(CcStub.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
-        }  
-    
-    
+        }
     }
-    
 }

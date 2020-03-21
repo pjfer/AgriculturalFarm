@@ -1,6 +1,5 @@
 package ControlCenter;
 
-import Communication.HarvestConfig;
 import Communication.HarvestState;
 import Communication.Message;
 import ControlCenter.GraphicalInterface.ControlCenterGUI;
@@ -50,7 +49,6 @@ public class CCController {
             Integer maxSteps, Integer timeout) {
         
         continueSimulation = true;
-        
         msgOut = new Message(HarvestState.Prepare, numCornCobs, 
                 numFarmers, maxSteps, timeout);
         
@@ -63,6 +61,10 @@ public class CCController {
                     + "FI server");
             System.exit(1);
         }
+    }
+    
+    public void readyToPrep() {
+        ccGUI.readyToPrep();
     }
     
     public void prepComplete() {
