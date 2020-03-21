@@ -92,10 +92,11 @@ public class MGranary {
         }
     }
     
-    public void waitForColleagues() {
+    public void waitForColleagues(int farmerId) {
         rl.lock();
         try {
             if(!stopSimulation){
+                fiController.waitForCollegues(farmerId);
                 while (!allCorbsCollected && !stopSimulation)
                     farmerCobsCollected.await();
             }

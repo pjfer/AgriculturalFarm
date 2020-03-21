@@ -65,25 +65,28 @@ public class MPath {
         rl.lock();
         
         try {
-            this.toGranary = toGranary;
-            Integer[] position;
-            
-            if (toGranary)
-                position = this.getPositionToGranary(new Integer[] {-1, -1});
-            else
-                position = this.getPositionToStoreHouse(new Integer[] {-1, -1});
-            
-            positions.put(id, position);
-            fiController.movePath(id, position);
-            farmersWaiting++;
-            Thread.sleep(movementTime);
-            while (!Objects.equals(farmersWaiting, 0) && !stopSimulation) {
-                if (Objects.equals(farmersWaiting, numFarmers) && !stopSimulation) {
-                    farmersWaiting = 0;
-                    farmerMoveForward.signal();
+            if(!stopSimulation){
+                this.toGranary = toGranary;
+                Integer[] position;
+
+                if (toGranary)
+                    position = this.getPositionToGranary(new Integer[] {-1, -1});
+                else
+                    position = this.getPositionToStoreHouse(new Integer[] {-1, -1});
+
+                positions.put(id, position);
+                fiController.movePath(id, position);
+                farmersWaiting++;
+                Thread.sleep(movementTime);
+                while (!Objects.equals(farmersWaiting, 0) && !stopSimulation) {
+                    if (Objects.equals(farmersWaiting, numFarmers) 
+                            && !stopSimulation) {
+                        farmersWaiting = 0;
+                        farmerMoveForward.signal();
+                    }
+
+                    farmerMoveForward.await();
                 }
-                
-                farmerMoveForward.await();
             }
         }
         catch (InterruptedException e) {
@@ -106,7 +109,8 @@ public class MPath {
                 else
                     position = this.getPositionToStoreHouse(positions.get(id));
                 Integer[] outsidePosition = { -1, -1 };
-                if (!Arrays.equals(position, outsidePosition) && !stopSimulation) {
+                if (!Arrays.equals(position, outsidePosition) 
+                        && !stopSimulation) {
                     positions.put(id, position);
                     fiController.movePath(id, position);
                     Thread.sleep(movementTime);
@@ -114,7 +118,8 @@ public class MPath {
                         farmerMoveForward.signal();
                         selected = order.peek();
                         order.add(id);
-                        while (!Objects.equals(selected, id) && !stopSimulation)
+                        while (!Objects.equals(selected, id) 
+                                && !stopSimulation)
                             farmerMoveForward.await();
                         order.remove();
                     }

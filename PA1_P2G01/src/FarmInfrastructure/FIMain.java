@@ -1,15 +1,21 @@
 package FarmInfrastructure;
 
+import Communication.ServerCom;
 import FarmInfrastructure.Com.CcStub;
-import FarmInfrastructure.Com.FIServer;
 import FarmInfrastructure.GUI.FarmInfGUI;
+import FarmInfrastructure.Thread.TCCCom;
 import FarmInfrastructure.Thread.TFarmer;
 import Monitors.MGranary;
 import Monitors.MPath;
 import Monitors.MStandingArea;
 import Monitors.MStoreHouse;
+import java.net.SocketTimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FIMain {
+    
+    public static boolean waitconnection;
     
     public static void main(String[] args){
         
@@ -28,7 +34,7 @@ public class FIMain {
         /**
          * Port of the host server for the Control Center.
          */
-        Integer ccPort = 1234;
+        Integer ccPort = 1200;
         
         /**
          * Interface to communicate with the Control Center.
@@ -63,13 +69,17 @@ public class FIMain {
         /**
          *  Port for the Farm Interface Server.
          */
-        Integer fiPort = 1235;
+        Integer fiPort = 1300;
         
         /**
-         * Farm Interface Server responsible to process the messages from the
-         * Control Center.
+         * Communication Channel of the server.
          */
-        FIServer fiServer = new FIServer(fiPort, fiController);
+        ServerCom scon, sconi;
+        
+        /**
+         * Thread to handle the process.
+         */
+        TCCCom handler;
         
         /*
             Set the monitors so the controller can use them.
@@ -78,7 +88,6 @@ public class FIMain {
         fiController.setPath(path);
         fiController.setSa(sa);
         fiController.setSh(sh);
-        fiController.setFiServer(fiServer);
         
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code ">
@@ -119,21 +128,25 @@ public class FIMain {
             threads[i-1].start();
         }
         
-        /*
-            Start the server.
-        */
-        if (!fiServer.start())
-            System.exit(1);
+       
+        scon = new ServerCom (fiPort);                            // criação do canal de escuta e sua associação
+        scon.start (); 
+        fiController.setSconi(scon);
         
         /*
             Wait for messages until it receives the die signal.
         */
+        waitconnection = true;
         do {
-            fiServer.newConnection();
-        } while(!fiServer.isClosed());
+            try {
+                sconi = scon.accept();
+                handler = new TCCCom(sconi, fiController);              // lançamento do agente prestador do serviço
+                handler.start ();                               // entrada em processo de escuta
+            } catch (SocketTimeoutException ex) {}
+        } while(waitconnection);
         
         /*
-            Wait for all the farmers to die.
+            Wait for all the farmers to die. 
         */
         for(int i = 0; i < 5; i++){
             try {
@@ -145,9 +158,10 @@ public class FIMain {
                 
                 System.out.println("Farmer "+(i+1)+ " has died");
             } catch (InterruptedException ex) {
-                System.err.println("ERROR: Unable to terminate farmer " + i+1);
+                System.err.println("ERROR: Unable to terminate farmer " + i);
             } 
         }
+        
         /*
             Delete the graphical interface.
         */

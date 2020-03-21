@@ -154,9 +154,12 @@ public class CcStub {
         
         msgIn = (Message) ccon.readObject();
         
+        
         if(msgIn.getType() == HarvestState.Error){
             System.err.println(msgIn.getBody());
             System.exit(1);
         }
+        ccon.close();
+        
     }
 }

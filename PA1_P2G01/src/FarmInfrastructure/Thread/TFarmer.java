@@ -66,14 +66,13 @@ public class TFarmer extends Thread{
          */
         boolean ended_path = false;
         /**
-         * First time entering the Store House
-         */
-        sh.enterSH(id);
-        
-        /**
          * Flag that signals that the farmer should die.
          */
         boolean exit = false;
+        
+        
+        //First time entering the Store House 
+        sh.enterSH(id);
         
         /**
          * Farmer Logic
@@ -101,7 +100,7 @@ public class TFarmer extends Thread{
             }
             
             //Waits for the proceed signal.
-            granary.waitForColleagues();
+            granary.waitForColleagues(id);
             
             //Enters Path again
             path.enterPath(id, false);

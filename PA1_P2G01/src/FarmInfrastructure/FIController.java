@@ -1,7 +1,7 @@
 package FarmInfrastructure;
 
+import Communication.ServerCom;
 import FarmInfrastructure.Com.CcStub;
-import FarmInfrastructure.Com.FIServer;
 import FarmInfrastructure.GUI.FarmInfGUI;
 import Monitors.MGranary;
 import Monitors.MPath;
@@ -60,7 +60,9 @@ public class FIController {
     /**
      * Class representative of the Farm Infrastructure Server.
      */
-    private FIServer fiServer;
+    private FIMain fiMain;
+    
+    private ServerCom sconi;
     
     /**
      * Integer that indicates the number of farmers awaiting an event.
@@ -122,8 +124,12 @@ public class FIController {
         this.sa = sa;
     }
     
-    public void setFiServer(FIServer fiServer){
-        this.fiServer = fiServer;
+    public void setFiServer(FIMain fiMain){
+        this.fiMain = fiMain;
+    }
+
+    public void setSconi(ServerCom sconi) {
+        this.sconi = sconi;
     }
     
     /**
@@ -242,6 +248,21 @@ public class FIController {
         cc.update("Farmer: " + farmerId + " colected one corn.\n");
     }
     
+    
+    
+    public void waitForCollegues(int farmerId) {
+        System.out.println("Farmer: " + farmerId + " colected all cobs.");
+        cc.update("Farmer: " + farmerId + " colected all corn.\n");
+        
+        counter ++;
+        
+        if(counter == nFarmers){
+            System.out.println("All Farmers Colected the Cobs");
+            cc.farmersWProceed();
+            counter = 0;
+        }
+    }
+    
     /**
      * Method called when a farmer stores a Cob.
      * Sends an update message to the Control Center 
@@ -339,12 +360,14 @@ public class FIController {
      * so that it stops receiving messages.
      */
     public void exitSimulation(){
-        System.out.println("Exit Simulation.");
+        FIMain.waitconnection = false;
+      
         sa.stopSimulation();
         path.stopSimulation();
         gr.stopSimulation();
         sh.exitSimulation();
-        fiServer.close();
+        System.out.println("Exit Simulation.");
+
     }
     
 }

@@ -44,11 +44,9 @@ public class CCController {
     public void prepareHarvest(Integer numCornCobs, Integer numFarmers, 
             Integer maxSteps, Integer timeout) {
         continueSimulation = true;
-        setupSocket();
         msgOut = new Message(HarvestState.Prepare, numCornCobs, 
                 numFarmers, maxSteps, timeout);
         sendMessage();
-        closeSocket();
     }
     
     public void readyToPrep() {
@@ -60,11 +58,9 @@ public class CCController {
     }
 
     public void startHarvest() {
-        setupSocket();
         String msgBody = "Start the harvest";
         msgOut = new Message(msgBody, HarvestState.Start);
         sendMessage();
-        closeSocket();
     }
     
     public void readyToCollect() {
@@ -72,11 +68,9 @@ public class CCController {
     }
 
     public void startCollecting() {
-        setupSocket();
         String msgBody = "Collect the corn cobs";
         msgOut = new Message(msgBody, HarvestState.Collect);
         sendMessage();
-        closeSocket();
     }
     
     public void readyToReturn() {
@@ -84,19 +78,15 @@ public class CCController {
     }
 
     public void returnHarvest() {
-        setupSocket();
         String msgBody = "Return with the corn cobs";
         msgOut = new Message(msgBody, HarvestState.Return);
         sendMessage();
-        closeSocket();
     }
 
     public void stop() {
-        setupSocket();
         String msgBody = "Stop the harvest";
         msgOut = new Message(msgBody, HarvestState.Stop);
         sendMessage();
-        closeSocket();
     }
     
     public void fiStopped() {
@@ -104,40 +94,14 @@ public class CCController {
     }
 
     public void exit() {
-        setupSocket();
         String msgBody = "End simulation";
         msgOut = new Message(msgBody, HarvestState.Exit);
         sendMessage();
-        closeSocket();
     }
     
     public void fiExited() {
         ccGUI.fiExited();
         continueSimulation = false;
-    }
-    
-    private void setupSocket() {
-        try {
-            socket = new Socket(host, port);
-        }
-        catch (IOException e) {
-            System.err.println("ERROR: Unable to create the socket to the "
-                    + "FI server!");
-            System.exit(1);
-        }
-    }
-    
-    private void closeSocket() {
-        try {
-            //Close the communication channels.
-            out.close();
-            socket.close();
-        }
-        catch(IOException e) {
-            System.err.println("ERROR: Unable to close the connection of " +
-                    socket);
-            System.exit(1);
-        }
     }
     
     private void sendMessage() {
@@ -158,5 +122,6 @@ public class CCController {
             System.err.println(msgIn.getBody());
             System.exit(1);
         }
+        ccon.close();
     }
 }
