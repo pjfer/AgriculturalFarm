@@ -19,14 +19,21 @@ public class CCController {
     private Message msgOut;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    private final String host;
+    private final Integer port;
     private final ControlCenterGUI ccGUI;
     
-    public CCController(Socket socket) {
+    public CCController(String host, Integer port) {
         continueSimulation = true;
         ccGUI = new ControlCenterGUI(this);
         ccGUI.startGUI(ccGUI);
-        
+        this.host = host;
+        this.port = port;
+    }
+    
+    public void setupSocket() {
         try {
+            Socket socket = new Socket(host, port);
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
         }
@@ -47,8 +54,8 @@ public class CCController {
     
     public void prepareHarvest(Integer numCornCobs, Integer numFarmers, 
             Integer maxSteps, Integer timeout) {
-        
         continueSimulation = true;
+        setupSocket();
         msgOut = new Message(HarvestState.Prepare, numCornCobs, 
                 numFarmers, maxSteps, timeout);
         
@@ -72,6 +79,7 @@ public class CCController {
     }
 
     public void startHarvest() {
+        setupSocket();
         String msgBody = "Start the harvest";
         msgOut = new Message(msgBody, HarvestState.Start);
         
@@ -91,6 +99,7 @@ public class CCController {
     }
 
     public void startCollecting() {
+        setupSocket();
         String msgBody = "Collect the corn cobs";
         msgOut = new Message(msgBody, HarvestState.Collect);
         
@@ -110,6 +119,7 @@ public class CCController {
     }
 
     public void returnHarvest() {
+        setupSocket();
         String msgBody = "Return with the corn cobs";
         msgOut = new Message(msgBody, HarvestState.Return);
         
@@ -125,6 +135,7 @@ public class CCController {
     }
 
     public void stop() {
+        setupSocket();
         String msgBody = "Stop the harvest";
         msgOut = new Message(msgBody, HarvestState.Stop);
         
@@ -144,6 +155,7 @@ public class CCController {
     }
 
     public void exit() {
+        setupSocket();
         String msgBody = "End simulation";
         msgOut = new Message(msgBody, HarvestState.Exit);
         
