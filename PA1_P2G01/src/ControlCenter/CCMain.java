@@ -12,7 +12,6 @@ public class CCMain {
         Integer fiPort = 1235;
         CCController ccController = new CCController(host, fiPort);
         CCServer ccServer = new CCServer(ccPort);
-        
         if (!ccServer.start())
             System.exit(1);
         
