@@ -47,9 +47,9 @@ public class CCController {
     
     public void prepareHarvest(Integer numCornCobs, Integer numFarmers, 
             Integer maxSteps, Integer timeout) {
+        
         continueSimulation = true;
-        String msgBody = "Prepare the harvest";
-        msgOut = new Message(msgBody, HarvestState.Prepare, numCornCobs, 
+        msgOut = new Message(HarvestState.Prepare, numCornCobs, 
                 numFarmers, maxSteps, timeout);
         
         try {

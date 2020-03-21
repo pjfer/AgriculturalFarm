@@ -7,12 +7,40 @@ import Monitors.MStoreHouse;
 
 public class TFarmer extends Thread{
     
+    /**
+     *  Farmer Id.
+     */
     private final int id;
+    
+    /**
+     * Monitor used to Control the Granary.
+     */
     private final MGranary granary;
+    
+    /**
+     * Monitor used to Control the Path.
+     */
     private final MPath path;
+    
+    /**
+     * Monitor used to Control the Store House.
+     */
     private final MStoreHouse sh;
+    
+    /**
+     * Monitor used to Control the Standing Area.
+     */
     private final MStandingArea sa;
     
+    /**
+     * Default Constructor.
+     * 
+     * @param id Farmer Id.
+     * @param granary Monitor used to Control the Granary.
+     * @param path Monitor used to Control the Path.
+     * @param sh Monitor used to Control the Store House.
+     * @param sa Monitor used to Control the Standing Area.
+     */ 
     public TFarmer(int id, MGranary granary, MPath path,
             MStoreHouse sh, MStandingArea sa){
         
@@ -25,31 +53,64 @@ public class TFarmer extends Thread{
     }
     
     @Override
+    /**
+     * Standard Run method of a thread, executes the farmer logic.
+     */
     public void run(){
+        /**
+         * Flag that signals that a farmer reached the end of the path.
+         */
         boolean ended_path = false;
+        /**
+         * First time entering the Store House
+         */
         sh.enterSH(id);
+        
+        /**
+         * Flag that signals that the farmer should die.
+         */
         boolean exit = false;
+        
+        /**
+         * Farmer Logic
+         */
         while(!exit){
+            //After entering the store house, waits the start of the simulation.
             sh.startSimulation(id);
+            //Enters the standing area.
             sa.enterSA(id);
+            //Enters Path.
             path.enterPath(id, true);
+            //Travels the path until it reaches the end.
             while(!ended_path){
                 ended_path = path.moveForward(id);
                 
             }
-            System.out.println("entering granary");
+            ended_path = false;
+            
+            //Enters the granary.
             granary.enterGranary(id);
+            
+            //Collects the cobs.
             for(int i = 0; i < 10; i++){
                 granary.collectCob(id);
             }
-            System.out.println("Farmer " + id + ": collected every corn cob!");
+            
+            //Waits for the proceed signal.
             granary.waitForColleagues();
+            
+            //Enters Path again
             path.enterPath(id, false);
-            ended_path = false;
+            
+            //Travels the path until it reaches the end.
             while(!ended_path){
                 ended_path = path.moveForward(id);
             }
+            
+            //Enters the store house again and checks if it has to die.
             exit = sh.enterSH(id);
+            
+            //Deposits the corn cobs.
             for(int i = 0; i < 10; i++){
                 sh.depositCorn(id);
             }

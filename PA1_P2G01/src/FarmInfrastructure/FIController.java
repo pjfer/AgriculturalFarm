@@ -9,26 +9,77 @@ import Monitors.MStandingArea;
 import Monitors.MStoreHouse;
 
 /**
- * Classe responsável por atualizar a Interface Gráfica e por
- * enviar mensagens ao CC.
+ * Class responsible for the update of the graphical interface,
+ * execution of the request from the Control Center and the delivery of the
+ * update messages to the it.
  */
 public class FIController {
     
+    /**
+     * Farm Interface Graphical Interface Controller.
+     */
     FarmInfGUI fiGUI;
-    public boolean allCorbsCollected;
+    
+    /**
+     * Flag that signals that all farmers collect all cobs.
+     */
+    public boolean allCobsCollected;
+    
+    /**
+     * Flag that signals that all farmers are awaiting in the granary.
+     */
     public boolean allFarmersInGranary;
+    
+    /**
+     * Monitor used to Control the Store House.
+     */
     private MStoreHouse sh;
+    
+    /**
+     * Monitor used to Control the Granary.
+     */
     private MGranary gr;
+    
+    /**
+     * Monitor used to Control the Path.
+     */
     private MPath path;
+    
+    /**
+     * Monitor used to Control the Standing Area.
+     */
     private MStandingArea sa;
+    
+    /**
+     * Stub Class used to send messages to the Control Center.
+     */
     private CcStub cc;
+    
+    /**
+     * Class representative of the Farm Infrastructure Server.
+     */
     private FIServer fiServer;
+    
+    /**
+     * Integer that indicates the number of farmers awaiting an event.
+     */
     private int counter;
+    
+    /**
+     * Integer that represents the number of 
+     * farmers running on the present simulation.
+     */
     private int nFarmers;
     
-    public FIController() {
-    }
-    
+    /**
+     *
+     * @param fiGUI Farm Interface Graphical Interface Controller.
+     * @param gr Monitor used to Control the Granary.
+     * @param path Monitor used to Control the Path.
+     * @param sa Monitor used to Control the Standing Area.
+     * @param sh Monitor used to Control the Store House.
+     * @param cc Stub Class used to send messages to the Control Center.
+     */
     public FIController(FarmInfGUI fiGUI, MGranary gr, 
             MPath path, MStandingArea sa, MStoreHouse sh, CcStub cc){
         
@@ -40,6 +91,13 @@ public class FIController {
         this.cc = cc;
         
     }
+    
+    /**
+     * Default Constructor
+     * 
+     * @param fiGUI Farm Interface Graphical Interface Controller.
+     * @param cc  Stub Class used to send messages to the Control Center.
+     */
     public FIController(FarmInfGUI fiGUI, CcStub cc){
         this.fiGUI = fiGUI;
         this.cc = cc;
@@ -65,18 +123,32 @@ public class FIController {
         this.fiServer = fiServer;
     }
     
-    public void farmerEnterSH(int id, int position) {
-        fiGUI.moveFarmer(id, new Integer[] {0, position});
-        System.out.println("Farmer: " + id 
+    /**
+     * Method called when a farmer enters the Store House.
+     * Sends an update message to the Control Center signaling the event.
+     * 
+     * @param farmerId Farmer ID.
+     * @param position Position in which the farmer was positioned.
+     */
+    public void farmerEnterSH(int farmerId, int position) {
+        fiGUI.moveFarmer(farmerId, new Integer[] {0, position});
+        System.out.println("Farmer: " + farmerId 
                 + " entered in the Store House in position: " + position);
         
-        cc.update("Farmer: " + id 
+        cc.update("Farmer: " + farmerId 
                 + " entered in the Store House in position: " + position);
     }
     
-    public void farmerAwaiting(int id) {
-        System.out.println("Farmer: " + id + "is awaiting in the SH.");
-        cc.update("Farmer: " + id + " is awaiting in the Store House.");
+    /**
+     * Method Called when a farmer waits the start of the Simulation.
+     * Sends an update message to the Control Center for each farmer awaiting
+     * and a WaitToStart message once all farmers are awaiting.
+     * 
+     * @param farmerId Farmer ID.
+     */
+    public void farmerAwaiting(int farmerId) {
+        System.out.println("Farmer: " + farmerId + "is awaiting in the SH.");
+        cc.update("Farmer: " + farmerId + " is awaiting in the Store House.");
         counter ++;
         
         if(counter == nFarmers){
@@ -85,11 +157,23 @@ public class FIController {
             counter = 0;
         }       
     }
-
-    public void farmerStanding(int id, int position) {
-        fiGUI.moveFarmer(id, new Integer[] {1, position});
-        System.out.println("Farmer: " + id + " entered the Standing Area in the position: " + (position + 1));
-        cc.update("Farmer: " + id + " entered the Standing Area in the position: " + (position + 1));
+    /**
+     * Method called when a farmer enters the Standing Area.
+     * Sends an update message to the Control Center for each farmer awaiting
+     * and a WaitToWalk message once all farmers are in the Standing Area.
+     * 
+     * @param farmerId Farmer ID.
+     * @param position Position in which the farmer was positioned.
+     */
+    public void farmerStanding(int farmerId, int position) {
+        fiGUI.moveFarmer(farmerId, new Integer[] {1, position});
+        System.out.println("Farmer: " + farmerId + 
+                " entered the Standing Area in the position: " 
+                + (position + 1));
+        
+        cc.update("Farmer: " + farmerId + 
+                " entered the Standing Area in the position: " 
+                + (position + 1));
         
         counter ++;
         
@@ -100,19 +184,40 @@ public class FIController {
         }
     }
 
-    public void movePath(Integer id, Integer[] position) {
-        fiGUI.moveFarmer(id, new Integer[] {2, position[0], position[1]});
-        System.out.println("Farmer: " + id + " moved in Path to the position: " 
+    /**
+     * Method called when a farmer moves in Path.
+     * Sends an update message to the Control Center for each farmer movement.
+     * 
+     * @param farmerId Farmer ID.
+     * @param position Position in which the farmer was positioned.
+     */
+    public void movePath(Integer farmerId, Integer[] position) {
+        fiGUI.moveFarmer(farmerId, 
+                new Integer[] {2, position[0], position[1]});
+        
+        System.out.println("Farmer: " + 
+                farmerId + " moved in Path to the position: " 
                 + position[0] + " : "+ position[1]);
         
-        cc.update("Farmer: " + id + " moved in Path to the position: " 
+        cc.update("Farmer: " + farmerId + " moved in Path to the position: " 
                 + position[0] + " : "+ position[1]);
     }
 
-    public void moveGranary(Integer id, Integer position) {
-        fiGUI.moveFarmer(id, new Integer[] {3, position});
-        System.out.println("Farmer: " + id + " entered the Granary in the position: "+ position);
-        cc.update("Farmer: " + id + " entered the Granary in the position: "+ position);
+    /**
+     * Method called when a farmer enters the Granary.
+     * Sends an update message to the Control Center for each farmer that enters.
+     * 
+     * @param farmerId Farmer ID.
+     * @param position Position in which the farmer was positioned. 
+     */
+    public void moveGranary(Integer farmerId, Integer position) {
+        fiGUI.moveFarmer(farmerId, new Integer[] {3, position});
+        System.out.println("Farmer: " + farmerId + 
+                " entered the Granary in the position: "+ position);
+        
+        cc.update("Farmer: " + farmerId + 
+                " entered the Granary in the position: "+ position);
+        
         counter ++;
         
         if(counter == nFarmers){
@@ -122,22 +227,51 @@ public class FIController {
         }
     }
     
-    public void collectCorn(Integer id){
-        System.out.println("Farmer: " + id + " colected one cobs.");
-        cc.update("Farmer: " + id + " colected one corn.");
+    /**
+     * Method called when a farmer collects a Cob.
+     * Sends an update message to the Control Center 
+     * for each cob collected for each farmer.
+     * 
+     * @param farmerId Farmer ID.
+     */
+    public void collectCorn(Integer farmerId){
+        System.out.println("Farmer: " + farmerId + " colected one cobs.");
+        cc.update("Farmer: " + farmerId + " colected one corn.");
     }
     
-    public void storeCorn(Integer id) {
-        System.out.println("Farmer: " + id + " stored one cobs.");
-        cc.update("Farmer: " + id + " stored one corn.");
+    /**
+     * Method called when a farmer stores a Cob.
+     * Sends an update message to the Control Center 
+     * for each cob stored for each farmer.
+     * 
+     * @param farmerId Farmer ID.
+     */
+    public void storeCorn(Integer farmerId) {
+        System.out.println("Farmer: " + farmerId + " stored one cobs.");
+        cc.update("Farmer: " + farmerId + " stored one corn.");
     }
     
+    /**
+     * Method called to indicate the end of the a Farmer Thread.
+     * 
+     * @param farmerId Farmer ID.
+     */
     public void farmerTerminated(int farmerId) {
         cc.farmerTerminated(farmerId);
     }
     
+    /**
+     * Method executed when Control Center sends a PrepareFarm message.
+     * Calls the prepareSimulation of every monitor resenting multiple variables 
+     * to default and setting the variables of the simulation to the values
+     * received from the Control Center.
+     * 
+     * @param nf Number of Farmers.
+     * @param to TimeOut of the Farmers.
+     * @param ns Number of maximum steps.
+     */
     public void prepareFarm(int nf, int to, int ns){
-        System.out.println("Preparing Farm");
+        System.out.println("Preparing Farm.");
        
         nFarmers = nf;
         counter = 0;
@@ -145,32 +279,64 @@ public class FIController {
         path.prepareSimulation(nf, to, ns);
         sa.prepareSimulation();
         
-        System.out.println("Farmers Proceed to Standing Area");
+        System.out.println("Farmers Proceed to Standing Area.");
         sh.prepareSimulation(nf, to);
         
     }
     
+    /**
+     * Method executed when the Control Center sends a Start.
+     * Executes a method on the standing area so that the farmers can proceed.
+     * 
+     */
     public void startMove(){
-        System.out.println("Farmers proceeded to Path");
+        System.out.println("Farmers proceeded to Path.");
         sa.proceedToPath();
     }
     
+    /**
+     * Method executed when the Control Center sends a Collect.
+     * Executes a method on the granary 
+     * so that the farmers can start collecting cobs.
+     */
     public void startCollection(){
+        System.out.println("Farmers start collecting Cobs.");
         gr.allFarmersInGranary();
     }
     
+    /**
+     * Method executed when the Control Center sends a Return.
+     * Executes a method on the granary 
+     * so that the farmers can proceed to the path.
+     */
     public void returnWCorn(){
+        System.out.println("Farmers return with the Cobs.");
         gr.returnToStoreHouse();
     }
     
+    /**
+     * Method executed when the Control Center sends a Stop.
+     * Executes the stopSimulation on every monitor, disabling
+     * all logic making farmers go to the beginning of the farm.
+     */
     public void stopHarvest(){
+        System.out.println("Stop the Harvest.");
         sa.stopSimulation();
         path.stopSimulation();
         gr.stopSimulation();
         sh.stopSimulation();
     }
     
+    /**
+     * Method executed when the Control Center sends a Exit.
+     * Executes the stopSimulation on every monitor, disabling
+     * all logic and executes the exit simulation on the Store House, 
+     * to signal the farmers threads that they must die.
+     * Executes the close method on the server 
+     * so that it stops receiving messages.
+     */
     public void exitSimulation(){
+        System.out.println("Exit Simulation.");
         sa.stopSimulation();
         path.stopSimulation();
         gr.stopSimulation();
