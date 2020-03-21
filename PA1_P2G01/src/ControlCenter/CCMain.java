@@ -15,13 +15,13 @@ public class CCMain {
         Integer fiPort = 1235;
         CCController ccController = null;
         CCServer ccServer = new CCServer(ccPort);
-        
+        /*
         try {
             ccController = new CCController(new Socket(host, fiPort));
         } catch (IOException e) {
             System.err.println("ERROR: Unable to connect to the FI server!");
             System.exit(1);
-        }
+        }*/
         
         if (!ccServer.start())
             System.exit(1);
