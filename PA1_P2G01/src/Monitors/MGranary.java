@@ -21,6 +21,8 @@ public class MGranary {
     private final Condition farmerEnteringGranary;
     private final Condition farmerCobsCollected;
     private boolean stopSimulation;
+    private int[] cobsCollected;
+    private int nCobs;
     
     public MGranary(FIController fiController) {
         this.numPositions = 5;
@@ -28,14 +30,17 @@ public class MGranary {
         this.rl = new ReentrantLock();
         this.farmerEnteringGranary = rl.newCondition();
         this.farmerCobsCollected = rl.newCondition();
+        this.cobsCollected = new int[]{0,0,0,0,0};
     }
     
-    public void prepareSimulation(int to) {
+    public void prepareSimulation(int to, int nCobs) {
         this.collectDuration = to;
         this.positions = new int[numPositions];
         this.waitingForAllFarmers = true;
         this.allCorbsCollected = false;
         this.stopSimulation = false;
+        this.cobsCollected = new int[]{0,0,0,0,0};
+        this.nCobs = nCobs;
     }
     
     public void stopSimulation(){
@@ -79,17 +84,22 @@ public class MGranary {
         }
     }
     
-    public synchronized void collectCob(int farmerId) {
+    public synchronized boolean collectCob(int farmerId) {
         try {
             if(!stopSimulation){
+                cobsCollected[farmerId-1] ++;
                 Thread.sleep(collectDuration);
                 fiController.collectCorn(farmerId);
+                if (cobsCollected[farmerId-1] == nCobs){
+                    return true;
+                }   
             }
         }
         catch (InterruptedException e) {
             System.err.println("ERROR: Farmer was badly interrupted when "
                     + "collecting a cob!");
         }
+        return false;
     }
     
     public void waitForColleagues(int farmerId) {

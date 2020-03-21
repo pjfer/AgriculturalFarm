@@ -6,21 +6,15 @@ import Communication.HarvestState;
 import Communication.Message;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 
 
 /**
  * Class that encapsulates the communication to the Control Center from the 
  * Farm infrastructure.
  * 
- * @author Rafael Teixeira
+ * @author Rafael Teixeira e Pedro Ferreira
  */
 public class CcStub {
-    
-    /**
-     * Represents the Communication Socket to the Control Center.
-     */
-    private Socket clientSocket;
     
     /**
      * Message received as the answer to the request made.
@@ -31,16 +25,6 @@ public class CcStub {
      * Message sent with the request we want.
      */
     private Message msgOut;
-    
-    /**
-     * Stream of the received answer.
-     */
-    private ObjectInputStream in;
-    
-    /**
-     * Stream of the sent request.
-     */
-    private ObjectOutputStream out;
     
     /**
      * Control Center Server IP.
@@ -139,6 +123,8 @@ public class CcStub {
     
     /**
      * Private Method that handles the delivery of the message and its answer.
+     * 
+     * @param msgOut Message t send to the Control Center.
      */
     private void sendMessage(Message msgOut) {
         ClientCom ccon = new ClientCom(host, ccPort);

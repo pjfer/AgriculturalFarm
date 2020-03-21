@@ -10,8 +10,6 @@ import Monitors.MPath;
 import Monitors.MStandingArea;
 import Monitors.MStoreHouse;
 import java.net.SocketTimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class FIMain {
     
@@ -35,6 +33,21 @@ public class FIMain {
          * Port of the host server for the Control Center.
          */
         Integer ccPort = 1200;
+        
+        /**
+         *  Port for the Farm Interface Server.
+         */
+        Integer fiPort = 1300;
+        
+        /**
+         * Communication Channel of the server.
+         */
+        ServerCom scon, sconi;
+        
+        /**
+         * Thread to handle the process.
+         */
+        TCCCom handler;
         
         /**
          * Interface to communicate with the Control Center.
@@ -66,30 +79,14 @@ public class FIMain {
          */
         MStandingArea sa = new MStandingArea(fiController);
         
-        /**
-         *  Port for the Farm Interface Server.
-         */
-        Integer fiPort = 1300;
         
-        /**
-         * Communication Channel of the server.
-         */
-        ServerCom scon, sconi;
-        
-        /**
-         * Thread to handle the process.
-         */
-        TCCCom handler;
-        
-        /*
-            Set the monitors so the controller can use them.
-        */
+        /*  Set the monitors so the controller can use them.*/
         fiController.setGr(gr);
         fiController.setPath(path);
         fiController.setSa(sa);
         fiController.setSh(sh);
         
-        /* Set the Nimbus look and feel */
+        /* Set the Nimbus look and feel. */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -101,27 +98,21 @@ public class FIMain {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FarmInfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FarmInfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FarmInfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(FarmInfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        
+        //</editor-fold>
 
-        /* Create and display the form */
+        /* Create and display the form. */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 fiGUI.setVisible(true);
             }
         });
         
-        /*
-            Create farmer threads.
-        */
+        /* Create farmer threads.*/
         Thread threads[] = new Thread[5];
         for(int i = 1; i <= 5; i++){
             threads[i-1] = new TFarmer(i, gr, path, sh, sa);
@@ -129,31 +120,28 @@ public class FIMain {
         }
         
        
-        scon = new ServerCom (fiPort);                            // criação do canal de escuta e sua associação
+        scon = new ServerCom (fiPort);
         scon.start (); 
-        fiController.setSconi(scon);
         
-        /*
-            Wait for messages until it receives the die signal.
-        */
+        /* Wait for messages until it receives the die signal.*/
         waitconnection = true;
         do {
             try {
+                /* Waits for a request from the server.*/
                 sconi = scon.accept();
-                handler = new TCCCom(sconi, fiController);              // lançamento do agente prestador do serviço
-                handler.start ();                               // entrada em processo de escuta
+                
+                /* Starts a thread to handle the request. */
+                handler = new TCCCom(sconi, fiController);              
+                handler.start ();
             } catch (SocketTimeoutException ex) {}
         } while(waitconnection);
         
-        /*
-            Wait for all the farmers to die. 
-        */
+        /* Wait for all the farmers to die. */
         for(int i = 0; i < 5; i++){
             try {
                 threads[i].join();
-                /*
-                    Send message that the farmer thread has terminated.
-                */
+                
+                /*Send message that the farmer thread has terminated.*/
                 fiController.farmerTerminated(i+1);
                 
                 System.out.println("Farmer "+(i+1)+ " has died");
@@ -162,11 +150,11 @@ public class FIMain {
             } 
         }
         
-        /*
-            Delete the graphical interface.
-        */
+        /*Delete the graphical interface.*/
         fiGUI.dispose();
-    
+        
+        /*Stop the farm interface server.*/
+        scon.end();
     }
     
     

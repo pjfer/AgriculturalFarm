@@ -49,7 +49,7 @@ public class Message implements Serializable {
     public Message(HarvestState type, Integer numCornCobs, 
             Integer numFarmers, Integer numMaxSteps, Integer timeoutPath) {
         this.type = type;
-        this.numCornCobs = -numCornCobs;
+        this.numCornCobs = numCornCobs;
         this.numFarmers = numFarmers;
         this.numMaxSteps = numMaxSteps;
         this.timeoutPath = timeoutPath;

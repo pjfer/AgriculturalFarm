@@ -1,6 +1,5 @@
 package FarmInfrastructure;
 
-import Communication.ServerCom;
 import FarmInfrastructure.Com.CcStub;
 import FarmInfrastructure.GUI.FarmInfGUI;
 import Monitors.MGranary;
@@ -10,7 +9,7 @@ import Monitors.MStoreHouse;
 
 /**
  * Class responsible for the update of the graphical interface,
- * execution of the request from the Control Center and the delivery of the
+ * execution of the requests of the Control Center and the delivery of the
  * update messages to the it.
  * 
  * @author Pedro Ferreira and Rafael Teixeira
@@ -55,14 +54,7 @@ public class FIController {
     /**
      * Stub Class used to send messages to the Control Center.
      */
-    private CcStub cc;
-    
-    /**
-     * Class representative of the Farm Infrastructure Server.
-     */
-    private FIMain fiMain;
-    
-    private ServerCom sconi;
+    private final CcStub cc;
     
     /**
      * Integer that indicates the number of farmers awaiting an event.
@@ -76,7 +68,8 @@ public class FIController {
     private int nFarmers;
     
     /**
-     *
+     * Constructor fo the class.
+     * 
      * @param fiGUI Farm Interface Graphical Interface Controller.
      * @param gr Monitor used to Control the Granary.
      * @param path Monitor used to Control the Path.
@@ -122,14 +115,6 @@ public class FIController {
 
     public void setSa(MStandingArea sa) {
         this.sa = sa;
-    }
-    
-    public void setFiServer(FIMain fiMain){
-        this.fiMain = fiMain;
-    }
-
-    public void setSconi(ServerCom sconi) {
-        this.sconi = sconi;
     }
     
     /**
@@ -214,7 +199,8 @@ public class FIController {
 
     /**
      * Method called when a farmer enters the Granary.
-     * Sends an update message to the Control Center for each farmer that enters.
+     * Sends an update message to the Control Center for each farmer that enters
+     * and WaitToCollect once all farmers have entered.
      * 
      * @param farmerId Farmer ID.
      * @param position Position in which the farmer was positioned. 
@@ -239,7 +225,7 @@ public class FIController {
     /**
      * Method called when a farmer collects a Cob.
      * Sends an update message to the Control Center 
-     * for each cob collected for each farmer.
+     * for a cob collected for a farmer.
      * 
      * @param farmerId Farmer ID.
      */
@@ -249,7 +235,13 @@ public class FIController {
     }
     
     
-    
+    /**
+     * Method called when a farmer collects all Cobs.
+     * Sends an update message to the Control Center 
+     * for each farmer and a WaitToReturn once all farmers collect the cobs.
+     * 
+     * @param farmerId Farmer ID.
+     */
     public void waitForCollegues(int farmerId) {
         System.out.println("Farmer: " + farmerId + " colected all cobs.");
         cc.update("Farmer: " + farmerId + " colected all corn.\n");
@@ -266,7 +258,7 @@ public class FIController {
     /**
      * Method called when a farmer stores a Cob.
      * Sends an update message to the Control Center 
-     * for each cob stored for each farmer.
+     * for a cob stored for a farmer.
      * 
      * @param farmerId Farmer ID.
      */
@@ -276,7 +268,7 @@ public class FIController {
     }
     
     /**
-     * Method called to indicate the end of the a Farmer Thread.
+     * Method called to indicate the end of a Farmer Thread.
      * 
      * @param farmerId Farmer ID.
      */
@@ -293,18 +285,19 @@ public class FIController {
      * @param nf Number of Farmers.
      * @param to TimeOut of the Farmers.
      * @param ns Number of maximum steps.
+     * @param nCobs Number of cobs.
      */
-    public void prepareFarm(int nf, int to, int ns){
+    public void prepareFarm(int nf, int to, int ns, int nCobs){
         System.out.println("Preparing Farm.");
        
         nFarmers = nf;
         counter = 0;
-        gr.prepareSimulation(to);
+        gr.prepareSimulation(to, nCobs);
         path.prepareSimulation(nf, to, ns);
         sa.prepareSimulation();
         
         System.out.println("Farmers Proceed to Standing Area.");
-        sh.prepareSimulation(nf, to);
+        sh.prepareSimulation(nf, to, nCobs);
         
     }
     
@@ -361,7 +354,7 @@ public class FIController {
      */
     public void exitSimulation(){
         FIMain.waitconnection = false;
-      
+        
         sa.stopSimulation();
         path.stopSimulation();
         gr.stopSimulation();

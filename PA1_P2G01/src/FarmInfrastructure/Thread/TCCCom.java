@@ -47,9 +47,7 @@ public class TCCCom extends Thread {
         this.sconi = sconi;
         this.fiController = fiController;
         
-        System.out.println("BANANAMORE");
-        
-        //Default Response Message
+        /* Default Response Message*/
         this.msgOut = new Message("200 Good Request", HarvestState.Ok);
     }
     
@@ -59,19 +57,21 @@ public class TCCCom extends Thread {
      * Standard Run method of a thread, executes the request handling.
      */
     public void run() {
-        System.out.println("entrei");
-        // Obtain the request message.
+
+        /* Obtain the request message. */
         msgIn = (Message) sconi.readObject();
         hvState = msgIn.getType();
 
         switch(hvState){
 
             case Prepare:
-                //Verification fo the validity of the request fields
+                System.out.println(msgIn.getNumFarmers() + " " + msgIn.getTimeoutPath() + " " + msgIn.getNumMaxSteps() + " " +  msgIn.getNumCornCobs());
+                /* Verification fo the validity of the request fields. */
                 if( msgIn.getNumFarmers() < 1 || msgIn.getNumFarmers() > 5
                         || msgIn.getTimeoutPath() <= 0 
                         || msgIn.getNumMaxSteps() < 1 
-                        || msgIn.getNumMaxSteps() >  2){
+                        || msgIn.getNumMaxSteps() >  2
+                        || msgIn.getNumCornCobs() < 1){
 
                     this.msgOut.setBody("400 Invalid Preparation Values.");
                     this.msgOut.setType(HarvestState.Error);
@@ -79,7 +79,8 @@ public class TCCCom extends Thread {
                 }
                 else{
                     fiController.prepareFarm(msgIn.getNumFarmers(), 
-                            msgIn.getTimeoutPath(), msgIn.getNumMaxSteps());
+                            msgIn.getTimeoutPath(), msgIn.getNumMaxSteps(),
+                            msgIn.getNumCornCobs());
                 }
                 break;
             case Start:
@@ -102,9 +103,10 @@ public class TCCCom extends Thread {
                 this.msgOut.setType(HarvestState.Error);
         }
 
-        //Send the response message.
+        /* Send the response message. */
         sconi.writeObject(msgOut);
-        // fechar canal de comunicação
+        
+        /* Close the communitaction channel. */
         sconi.close();
         
     }

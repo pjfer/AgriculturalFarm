@@ -74,7 +74,7 @@ public class ServerCom
    {
       try
       { listeningSocket = new ServerSocket (serverPortNumb);
-          setTimeout(5000);
+          setTimeout(1000);
       }
       catch (BindException e)                         // erro fatal --- port já em uso
       { System.out.println(Thread.currentThread ().getName () +

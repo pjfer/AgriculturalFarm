@@ -62,62 +62,64 @@ public class TFarmer extends Thread{
      */
     public void run(){
         /**
-         * Flag that signals that a farmer reached the end of the path.
+         * Flag that signals that a farmer reached the end of a task.
          */
-        boolean ended_path = false;
+        boolean has_finished = false;
         /**
          * Flag that signals that the farmer should die.
          */
         boolean exit = false;
         
         
-        //First time entering the Store House 
+        /* First time entering the Store House */
         sh.enterSH(id);
         
-        /**
-         * Farmer Logic
-         */
+        /* Farmer Logic. */
         while(!exit){
-            //After entering the store house, waits the start of the simulation.
+            /*After entering the store house, waits the start of the simulation.*/
             sh.startSimulation(id);
-            //Enters the standing area.
+            
+            /*Enters the standing area.*/
             sa.enterSA(id);
-            //Enters Path.
+            
+            /*Enters Path.*/
             path.enterPath(id, true);
-            //Travels the path until it reaches the end.
-            while(!ended_path){
-                ended_path = path.moveForward(id);
+            
+            /* Travels the path until it reaches the end.*/
+            while(!has_finished){
+                has_finished = path.moveForward(id);
                 
             }
-            ended_path = false;
+            has_finished = false;
             
-            //Enters the granary.
+            /* Enters the granary. */
             granary.enterGranary(id);
             
-            //Collects the cobs.
-            for(int i = 0; i < 10; i++){
-                granary.collectCob(id);
+            /* Collects the cobs. */
+            while(!has_finished){
+                has_finished = granary.collectCob(id);
             }
-            
-            //Waits for the proceed signal.
+            has_finished = false;
+            /* Waits for the proceed signal. */
             granary.waitForColleagues(id);
             
-            //Enters Path again
+            /* Enters Path again*/
             path.enterPath(id, false);
             
-            //Travels the path until it reaches the end.
-            while(!ended_path){
-                ended_path = path.moveForward(id);
+            /* Travels the path until it reaches the end.*/
+            while(!has_finished){
+                has_finished = path.moveForward(id);
             }
+            has_finished = false;
             
-            //Enters the store house again and checks if it has to die.
+            /*Enters the store house again and checks if it has to die.*/
             exit = sh.enterSH(id);
             
-            //Deposits the corn cobs.
-            for(int i = 0; i < 10; i++){
-                sh.depositCorn(id);
+            /*Deposits the corn cobs.*/
+            while(!has_finished){
+                has_finished = sh.depositCorn(id);
             }
-            ended_path = false;
+            has_finished = false;
         }
         
     }

@@ -18,6 +18,8 @@ public class MStoreHouse {
     private final int totalFarmers = 5;
     private boolean stopSimulation;
     private boolean exitSimulation;
+    private int[] cobsDeposited;
+    private int nCobs;
     
     public MStoreHouse(FIController fiController){
         this.fiController = fiController;
@@ -30,7 +32,7 @@ public class MStoreHouse {
         }
     }
     
-    public void prepareSimulation(int nf, int to){
+    public void prepareSimulation(int nf, int to, int nCobs){
         rl.lock();
         try{
             this.nFarmers = nf;
@@ -38,6 +40,8 @@ public class MStoreHouse {
             fToRelease = nFarmers;
             this.stopSimulation = false;
             this.exitSimulation = false;
+            this.cobsDeposited = new int[]{0,0,0,0,0};
+            this.nCobs = nCobs;
             waitStart.signalAll();
         }
         finally{
@@ -54,6 +58,15 @@ public class MStoreHouse {
         
     }
     
+    public void releaseWaitingStart(){
+        rl.lock();
+        try {
+            waitStart.signalAll();
+        } finally {
+            rl.unlock();
+        }
+    }
+    
     public void exitSimulation(){
         rl.lock();
         try {
@@ -68,12 +81,14 @@ public class MStoreHouse {
     public void startSimulation(int id){
         rl.lock();
         try{
-            fiController.farmerAwaiting(id);
-            while(fToRelease == 0 && !exitSimulation){
-                waitStart.await();
+            if(!exitSimulation){
+                fiController.farmerAwaiting(id);
+                while(fToRelease == 0 && !exitSimulation){
+                    waitStart.await();
+                }
+                fToRelease --;
+                this.releasePosition(id);
             }
-            fToRelease --;
-            this.releasePosition(id);
         }
         catch(InterruptedException Ex){}
         finally{
@@ -89,15 +104,21 @@ public class MStoreHouse {
         return this.exitSimulation;
     }
     
-    public synchronized void depositCorn(Integer farmerId){
+    public synchronized boolean depositCorn(Integer farmerId){
         try {
             if(!stopSimulation){
+                cobsDeposited[farmerId-1] ++;
                 Thread.sleep(depositDurantion);
                 fiController.storeCorn(farmerId);
+                
+                if (cobsDeposited[farmerId-1] == nCobs){
+                    return true;
+                }  
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(MStoreHouse.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return false;
     }
     
     private int selectPosition(int id){

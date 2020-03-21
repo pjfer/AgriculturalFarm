@@ -4,7 +4,6 @@ import Communication.ClientCom;
 import Communication.HarvestState;
 import Communication.Message;
 import ControlCenter.GraphicalInterface.ControlCenterGUI;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -15,7 +14,6 @@ import java.net.Socket;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public class CCController {
-    private Socket socket;
     private boolean continueSimulation;
     private Message msgIn;
     private Message msgOut;
