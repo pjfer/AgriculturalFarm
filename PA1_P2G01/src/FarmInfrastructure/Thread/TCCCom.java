@@ -89,7 +89,7 @@ public class TCCCom extends Thread {
                 
                 case Prepare:
                     //Verification fo the validity of the request fields
-                    if(msgIn.getNumFarmers() < 1 || msgIn.getNumFarmers() > 5
+                    if( msgIn.getNumFarmers() < 1 || msgIn.getNumFarmers() > 5
                             || msgIn.getTimeoutPath() <= 0 
                             || msgIn.getNumMaxSteps() < 1 
                             || msgIn.getNumMaxSteps() >  2){

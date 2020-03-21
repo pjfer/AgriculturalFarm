@@ -12,6 +12,8 @@ import Monitors.MStoreHouse;
  * Class responsible for the update of the graphical interface,
  * execution of the request from the Control Center and the delivery of the
  * update messages to the it.
+ * 
+ * @author Pedro Ferreira and Rafael Teixeira
  */
 public class FIController {
     

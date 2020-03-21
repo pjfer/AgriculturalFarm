@@ -4,7 +4,11 @@ import Monitors.MPath;
 import Monitors.MStandingArea;
 import Monitors.MStoreHouse;
 
-
+/**
+ * Class that represents a farmer.
+ * 
+ * @author Rafael Teixeira e Pedro Ferreira
+ */
 public class TFarmer extends Thread{
     
     /**

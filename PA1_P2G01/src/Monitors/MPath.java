@@ -76,7 +76,7 @@ public class MPath {
             positions.put(id, position);
             fiController.movePath(id, position);
             farmersWaiting++;
-            
+            Thread.sleep(movementTime);
             while (!Objects.equals(farmersWaiting, 0) && !stopSimulation) {
                 if (Objects.equals(farmersWaiting, numFarmers) && !stopSimulation) {
                     farmersWaiting = 0;
