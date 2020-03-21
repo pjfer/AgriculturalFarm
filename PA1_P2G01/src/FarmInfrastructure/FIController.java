@@ -91,7 +91,7 @@ public class FIController {
         this.path = path;
         this.sa = sa;
         this.cc = cc;
-        
+        this.nFarmers = 5;
     }
     
     /**
@@ -103,6 +103,7 @@ public class FIController {
     public FIController(FarmInfGUI fiGUI, CcStub cc){
         this.fiGUI = fiGUI;
         this.cc = cc;
+        this.nFarmers = 5;
     }
 
     public void setSh(MStoreHouse sh) {

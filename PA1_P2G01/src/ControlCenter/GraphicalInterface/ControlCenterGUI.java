@@ -276,9 +276,9 @@ public class ControlCenterGUI extends javax.swing.JFrame {
                     "Number of corn cobs must be equal or lower to 10!", 
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
-        else if (numFarmers != 2 && numFarmers != 5) {
+        else if (numFarmers < 2 || numFarmers > 5) {
             JOptionPane.showMessageDialog(new JPanel(), 
-                    "Number of farmers must be equal to 2 or 5!", 
+                    "Number of farmers must be between 2 and 5!", 
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
         else if (maxSteps != 1 && maxSteps != 2) {
