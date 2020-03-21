@@ -1,8 +1,8 @@
 package FarmInfrastructure.Thread;
-import Monitors.MGranary;
-import Monitors.MPath;
-import Monitors.MStandingArea;
-import Monitors.MStoreHouse;
+import Monitors.Interfaces.IGranaryF;
+import Monitors.Interfaces.IPathF;
+import Monitors.Interfaces.IStandingAreaF;
+import Monitors.Interfaces.IStoreHouseF;
 
 /**
  * Class that represents a farmer.
@@ -19,22 +19,22 @@ public class TFarmer extends Thread{
     /**
      * Monitor used to Control the Granary.
      */
-    private final MGranary granary;
+    private final IGranaryF granary;
     
     /**
      * Monitor used to Control the Path.
      */
-    private final MPath path;
+    private final IPathF path;
     
     /**
      * Monitor used to Control the Store House.
      */
-    private final MStoreHouse sh;
+    private final IStoreHouseF sh;
     
     /**
      * Monitor used to Control the Standing Area.
      */
-    private final MStandingArea sa;
+    private final IStandingAreaF sa;
     
     /**
      * Default Constructor.
@@ -45,8 +45,8 @@ public class TFarmer extends Thread{
      * @param sh Monitor used to Control the Store House.
      * @param sa Monitor used to Control the Standing Area.
      */ 
-    public TFarmer(int id, MGranary granary, MPath path,
-            MStoreHouse sh, MStandingArea sa){
+    public TFarmer(int id, IGranaryF granary, IPathF path,
+            IStoreHouseF sh, IStandingAreaF sa){
         
         this.id = id;
         this.granary = granary;

@@ -2,6 +2,10 @@ package FarmInfrastructure;
 
 import FarmInfrastructure.Com.CcStub;
 import FarmInfrastructure.GUI.FarmInfGUI;
+import Monitors.Interfaces.IGranaryC;
+import Monitors.Interfaces.IPathC;
+import Monitors.Interfaces.IStandingAreaC;
+import Monitors.Interfaces.IStoreHouseC;
 import Monitors.MGranary;
 import Monitors.MPath;
 import Monitors.MStandingArea;
@@ -34,22 +38,22 @@ public class FIController {
     /**
      * Monitor used to Control the Store House.
      */
-    private MStoreHouse sh;
+    private IStoreHouseC sh;
     
     /**
      * Monitor used to Control the Granary.
      */
-    private MGranary gr;
+    private IGranaryC gr;
     
     /**
      * Monitor used to Control the Path.
      */
-    private MPath path;
+    private IPathC path;
     
     /**
      * Monitor used to Control the Standing Area.
      */
-    private MStandingArea sa;
+    private IStandingAreaC sa;
     
     /**
      * Stub Class used to send messages to the Control Center.
@@ -68,7 +72,7 @@ public class FIController {
     private int nFarmers;
     
     /**
-     * Constructor fo the class.
+     * Constructor for the class.
      * 
      * @param fiGUI Farm Interface Graphical Interface Controller.
      * @param gr Monitor used to Control the Granary.
@@ -77,8 +81,8 @@ public class FIController {
      * @param sh Monitor used to Control the Store House.
      * @param cc Stub Class used to send messages to the Control Center.
      */
-    public FIController(FarmInfGUI fiGUI, MGranary gr, 
-            MPath path, MStandingArea sa, MStoreHouse sh, CcStub cc){
+    public FIController(FarmInfGUI fiGUI, IGranaryC gr, 
+            IPathC path, IStandingAreaC sa, IStoreHouseC sh, CcStub cc){
         
         this.fiGUI = fiGUI;
         this.sh = sh;

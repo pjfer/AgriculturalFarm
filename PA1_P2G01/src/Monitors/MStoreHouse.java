@@ -1,6 +1,8 @@
 package Monitors;
 
 import FarmInfrastructure.FIController;
+import Monitors.Interfaces.IStoreHouseC;
+import Monitors.Interfaces.IStoreHouseF;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -11,7 +13,7 @@ import java.util.logging.Logger;
  * 
  * @author Rafael Teixeira e Pedro Ferreira
  */
-public class MStoreHouse {
+public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
     
     /**
      * Farm Interface Controller.
@@ -90,14 +92,8 @@ public class MStoreHouse {
         }
     }
     
-    /**
-     * Method called when starting a simulation.
-     * Resets the values of the different variables.
-     * 
-     * @param nf Number of Farmers.
-     * @param to Time a Farmer takes to deposit a cob.
-     * @param nCobs Number of cobs to be deposited.
-     */
+
+    @Override
     public void prepareSimulation(int nf, int to, int nCobs){
         rl.lock();
         try{
@@ -115,11 +111,8 @@ public class MStoreHouse {
         }
     }
     
-    /**
-     * Method called when the Control Center sends a Stop.
-     * It turns the stop flag true and frees every farmer 
-     * waiting to move to the path so that they can be reseted.
-     */
+
+    @Override
     public void stopSimulation(){
         rl.lock();
         try {
@@ -130,11 +123,8 @@ public class MStoreHouse {
         
     }
     
-    /**
-     * Method called when the Control Center sends a Exit.
-     * It turns the stop flag and the exit flag true and frees every farmer 
-     * waiting to move to the standing area so that they end their execution.
-     */
+
+    @Override
     public void exitSimulation(){
         rl.lock();
         try {
@@ -145,13 +135,8 @@ public class MStoreHouse {
             rl.unlock();
         }
     }
-    
-    
-    /**
-     * Method called by a farmer when they enter the store house 
-     * for the first time or they ended a simulation.
-     * @param farmerId Farmer ID.
-     */    
+      
+    @Override
     public void startSimulation(int farmerId){
         rl.lock();
         try{
@@ -176,31 +161,24 @@ public class MStoreHouse {
         }
     }
     
-    /**
-     * Method called by a farmer when they need to deposit cobs.
-     * 
-     * @param farmerID Farmer ID.
-     * @return Indicates if more simulations are to be done or not.
-     */
-    public synchronized boolean enterSH(int farmerID){
+
+    @Override
+    public synchronized boolean enterSH(int farmerId){
         /* Verifies if more simulations will be done. */
         if(!exitSimulation){
             /* Selects a position from the Store House */
-            int position = this.selectPosition(farmerID);
+            int position = this.selectPosition(farmerId);
             
             /* Updates the Control Center on the farmer status. */
-            fiController.farmerEnterSH(farmerID, position);
+            fiController.farmerEnterSH(farmerId, position);
         }
         
         return this.exitSimulation;
     }
     
-    /**
-     * Method called from a farmer when he needs to deposit cobs.
-     * @param farmerId Farmer ID.
-     * @return Indicates if the farmer has deposited every cob.
-     */
-    public synchronized boolean depositCorn(Integer farmerId){
+
+    @Override
+    public synchronized boolean depositCorn(int farmerId){
         try {
             /* Verifies if the simulation was stoped */
             if(!stopSimulation){
@@ -222,7 +200,8 @@ public class MStoreHouse {
                 return true;
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(MStoreHouse.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MStoreHouse.class.getName())
+                    .log(Level.SEVERE, null, ex);
         }
         return false;
     }

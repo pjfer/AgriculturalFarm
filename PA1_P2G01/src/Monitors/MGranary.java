@@ -1,6 +1,8 @@
 package Monitors;
 
 import FarmInfrastructure.FIController;
+import Monitors.Interfaces.IGranaryC;
+import Monitors.Interfaces.IGranaryF;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -9,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 
  * @author Pedro Ferreira and Rafael Teixeira
  */
-public class MGranary {
+public class MGranary implements IGranaryC, IGranaryF {
     private Integer collectDuration;
     private final Integer numPositions;
     private int[] positions;
@@ -32,6 +34,7 @@ public class MGranary {
         this.cobsCollected = new int[]{0,0,0,0,0};
     }
     
+    @Override
     public void prepareSimulation(int to, int nCobs) {
         this.collectDuration = to;
         this.positions = new int[numPositions];
@@ -42,6 +45,7 @@ public class MGranary {
         this.nCobs = nCobs;
     }
     
+    @Override
     public void stopSimulation(){
         rl.lock();
         try{
@@ -54,7 +58,8 @@ public class MGranary {
         }
     }
     
-    public void enterGranary(Integer id) {
+    @Override
+    public void enterGranary(int id) {
         rl.lock();
         
         try {
@@ -83,6 +88,7 @@ public class MGranary {
         }
     }
     
+    @Override
     public synchronized boolean collectCob(int farmerId) {
         try {
             if(!stopSimulation){
@@ -104,6 +110,7 @@ public class MGranary {
         return false;
     }
     
+    @Override
     public void waitForColleagues(int farmerId) {
         rl.lock();
         try {
@@ -122,6 +129,7 @@ public class MGranary {
         }
     }
     
+    @Override
     public void returnToStoreHouse() {
         rl.lock();
         
@@ -135,6 +143,7 @@ public class MGranary {
         }
     }
     
+    @Override
     public void allFarmersInGranary() {
         rl.lock();
         

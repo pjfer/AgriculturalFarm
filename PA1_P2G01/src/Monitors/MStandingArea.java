@@ -1,6 +1,8 @@
 package Monitors;
 
 import FarmInfrastructure.FIController;
+import Monitors.Interfaces.IStandingAreaC;
+import Monitors.Interfaces.IStandingAreaF;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -12,7 +14,7 @@ import java.util.logging.Logger;
  * 
  * @author Rafael Teixeira e Pedro Ferreira
  */
-public class MStandingArea {
+public class MStandingArea implements IStandingAreaC, IStandingAreaF{
     
     /**
      * Farm Interface Controller.
@@ -67,10 +69,6 @@ public class MStandingArea {
         
     }
     
-    /**
-     * Method called by a farmer to enter the Standing Area.
-     * @param farmerId FarmerId.
-     */
     public void enterSA(int farmerId){
         rl.lock();
         
@@ -97,10 +95,6 @@ public class MStandingArea {
         }
     }
     
-    /**
-     * Method called after receiving a start from the CC.
-     * Frees all the farmers waiting to proceed to the Path.
-     */
     public void proceedToPath(){
         rl.lock();
         try{
@@ -137,10 +131,8 @@ public class MStandingArea {
         return position;
     }
     
-    /**
-     * Method called when starting a simulation.
-     * Resets the values of the different variables.
-     */
+
+    @Override
     public void prepareSimulation(){
         stopSimulation = false;
         proceed = false;
@@ -149,12 +141,8 @@ public class MStandingArea {
             farmersPosition[i] = -1;
         }
     }
-    
-    /**
-     * Method called when the Control Center sends a Stop.
-     * It turns the stop flag true and frees every farmer 
-     * waiting to move to the path so that they can be reseted.
-     */
+
+    @Override
     public void stopSimulation(){
         rl.lock();
         try{

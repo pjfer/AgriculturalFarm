@@ -1,6 +1,8 @@
 package Monitors;
 
 import FarmInfrastructure.FIController;
+import Monitors.Interfaces.IPathC;
+import Monitors.Interfaces.IPathF;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Pedro Ferreira and Rafael Teixeira
  */
-public class MPath {
+public class MPath implements IPathC, IPathF{
     private Integer selected;
     private boolean toGranary;
     private Integer movementTime;
@@ -38,6 +40,7 @@ public class MPath {
         this.farmerMoveForward = rl.newCondition();
     }
     
+    @Override
     public void prepareSimulation(int nf, int to, int ns) {
         this.toGranary = true;
         this.numFarmers = nf;
@@ -50,6 +53,7 @@ public class MPath {
         this.stopSimulation = false;
     }
     
+    @Override
     public void stopSimulation(){
         rl.lock();
         try{
@@ -61,7 +65,8 @@ public class MPath {
         }
     }
     
-    public void enterPath(Integer id, boolean toGranary) {
+    @Override
+    public void enterPath(int id, boolean toGranary) {
         rl.lock();
         
         try {
@@ -99,7 +104,8 @@ public class MPath {
         
     }
     
-    public boolean moveForward(Integer id) {
+    @Override
+    public boolean moveForward(int id) {
         rl.lock();
         try {
             if(!stopSimulation){
