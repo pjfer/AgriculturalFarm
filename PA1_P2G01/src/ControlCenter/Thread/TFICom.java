@@ -37,7 +37,6 @@ public class TFICom extends Thread {
     public void run() {
         try {
             in = new ObjectInputStream(clientSocket.getInputStream());
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
             msgIn = (Message) in.readObject();
             hvState = msgIn.getType();
             
@@ -77,6 +76,7 @@ public class TFICom extends Thread {
                     System.exit(1);
             }
             
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
             msgOut = new Message(msgBody, hvState);
             out.writeObject(msgOut);
             out.flush();

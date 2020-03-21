@@ -150,7 +150,7 @@ public class FIController {
      * @param farmerId Farmer ID.
      */
     public void farmerAwaiting(int farmerId) {
-        System.out.println("Farmer: " + farmerId + "is awaiting in the SH.");
+        System.out.println("Farmer: " + farmerId + " is awaiting in the SH.");
         cc.update("Farmer: " + farmerId + " is awaiting in the Store House.");
         counter ++;
         

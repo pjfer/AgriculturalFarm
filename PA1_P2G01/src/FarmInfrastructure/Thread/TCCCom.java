@@ -77,9 +77,8 @@ public class TCCCom extends Thread {
      */
     public void run() {
         try {
-            //Create the Stream to receive / send messages.
+            //Create the Stream to receive messages.
             in = new ObjectInputStream(clientSocket.getInputStream());
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
             
             // Obtain the request message.
             msgIn = (Message) in.readObject();
@@ -122,6 +121,9 @@ public class TCCCom extends Thread {
                     this.msgOut.setBody("400 Bad Request.");
                     this.msgOut.setType(HarvestState.Error);
             }
+            
+            //Create the Stream to send messages.
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
             
             //Send the response message.
             out.writeObject(msgOut);

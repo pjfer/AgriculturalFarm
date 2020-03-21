@@ -8,8 +8,6 @@ import Monitors.MGranary;
 import Monitors.MPath;
 import Monitors.MStandingArea;
 import Monitors.MStoreHouse;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class FIMain {
     
@@ -147,7 +145,7 @@ public class FIMain {
                 
                 System.out.println("Farmer "+(i+1)+ " has died");
             } catch (InterruptedException ex) {
-                Logger.getLogger(FIMain.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("ERROR: Unable to terminate farmer " + i+1);
             } 
         }
         /*

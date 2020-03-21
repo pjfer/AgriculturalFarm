@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -145,15 +143,13 @@ public class CcStub {
      * Private Method that handles the delivery of the message and its answer.
      */
     private void sendMessage(Message msgOut){
-        
         try {
             clientSocket = new Socket(host, ccPort);
-            in = new ObjectInputStream(clientSocket.getInputStream());
             out = new ObjectOutputStream(clientSocket.getOutputStream());
-            
             out.writeObject(msgOut);
             out.flush();
             
+            in = new ObjectInputStream(clientSocket.getInputStream());
             msgIn = (Message) in.readObject();
             
             if(msgIn.getType() == HarvestState.Error){
@@ -161,12 +157,21 @@ public class CcStub {
                 System.exit(1);
             }
         }
-        catch (IOException e) {
+        catch (IOException | ClassNotFoundException e) {
             System.err.println("ERROR: Unable to send the message to the "
-                    + "FI server");
+                    + "CC server");
             System.exit(1);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(CcStub.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try {
+            //Close the communication channels.
+            in.close();
+            out.close();
+            clientSocket.close();
+        }
+        catch(IOException e) {
+            System.err.println("ERROR: Unable to close the connection of " +
+                    clientSocket);
             System.exit(1);
         }
     }
