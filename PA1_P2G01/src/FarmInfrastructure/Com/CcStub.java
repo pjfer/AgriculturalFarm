@@ -4,8 +4,6 @@ package FarmInfrastructure.Com;
 import Communication.ClientCom;
 import Communication.HarvestState;
 import Communication.Message;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 
 /**

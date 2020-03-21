@@ -5,8 +5,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Class with the task of controlling the access to shared regions of the 
- * Granary, dealing with the associated concurrence between the farmers.
+ * Class with the task of controlling the access to the Granary.
  * 
  * @author Pedro Ferreira and Rafael Teixeira
  */
