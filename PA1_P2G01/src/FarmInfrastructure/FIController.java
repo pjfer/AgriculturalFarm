@@ -6,10 +6,6 @@ import Monitors.Interfaces.IGranaryC;
 import Monitors.Interfaces.IPathC;
 import Monitors.Interfaces.IStandingAreaC;
 import Monitors.Interfaces.IStoreHouseC;
-import Monitors.MGranary;
-import Monitors.MPath;
-import Monitors.MStandingArea;
-import Monitors.MStoreHouse;
 
 /**
  * Class responsible for the update of the graphical interface,
@@ -105,19 +101,19 @@ public class FIController {
         this.nFarmers = 5;
     }
 
-    public void setSh(MStoreHouse sh) {
+    public void setSh(IStoreHouseC sh) {
         this.sh = sh;
     }
 
-    public void setGr(MGranary gr) {
+    public void setGr(IGranaryC gr) {
         this.gr = gr;
     }
 
-    public void setPath(MPath path) {
+    public void setPath(IPathC path) {
         this.path = path;
     }
 
-    public void setSa(MStandingArea sa) {
+    public void setSa(IStandingAreaC sa) {
         this.sa = sa;
     }
     
