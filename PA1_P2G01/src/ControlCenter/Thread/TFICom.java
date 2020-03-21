@@ -42,38 +42,34 @@ public class TFICom extends Thread {
             hvState = msgIn.getType();
             
             switch (hvState) {
-                case Prepare:
+                case WaitToStart:
+                    ccController.readyToPrep();
+                    break;
+                case WaitToWalk:
                     ccController.updateGUITextArea(msgIn.getBody());
                     ccController.prepComplete();
-                    msgOut = new Message(msgBody, hvState);
                     break;
-                case Start:
+                case Update:
                     ccController.updateGUITextArea(msgIn.getBody());
-                    msgOut = new Message(msgBody, hvState);
                     break;
                 case WaitToCollect:
                     ccController.updateGUITextArea(msgIn.getBody());
                     ccController.readyToCollect();
-                    msgOut = new Message(msgBody, hvState);
                     break;
                 case WaitToReturn:
                     ccController.updateGUITextArea(msgIn.getBody());
                     ccController.readyToReturn();
-                    msgOut = new Message(msgBody, hvState);
                     break;
-                case Store:
+                case FarmerTerminated:
                     ccController.updateGUITextArea(msgIn.getBody());
-                    msgOut = new Message(msgBody, hvState);
                     break;
                 case Stop:
                     ccController.updateGUITextArea(msgIn.getBody());
-                    msgOut = new Message(msgBody, hvState);
                     ccController.fiStopped();
                     break;
                 case Exit:
                     ccController.updateGUITextArea(msgIn.getBody());
                     ccController.fiExited();
-                    msgOut = new Message(msgBody, hvState);
                     break;
                 default:
                     System.err.println("ERROR: Unable to recognize the given"
@@ -81,6 +77,7 @@ public class TFICom extends Thread {
                     System.exit(1);
             }
             
+            msgOut = new Message(msgBody, hvState);
             out.writeObject(msgOut);
             out.flush();
         }

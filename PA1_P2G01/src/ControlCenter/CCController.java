@@ -1,6 +1,5 @@
 package ControlCenter;
 
-import Communication.HarvestConfig;
 import Communication.HarvestState;
 import Communication.Message;
 import ControlCenter.GraphicalInterface.ControlCenterGUI;
@@ -49,10 +48,9 @@ public class CCController {
     public void prepareHarvest(Integer numCornCobs, Integer numFarmers, 
             Integer maxSteps, Integer timeout) {
         continueSimulation = true;
-        HarvestConfig hc = new HarvestConfig(numCornCobs, numFarmers, 
-                maxSteps, timeout);
-        String msgBody = hc.toString();
-        msgOut = new Message(msgBody, HarvestState.Prepare);
+        String msgBody = "Prepare the harvest";
+        msgOut = new Message(msgBody, HarvestState.Prepare, numCornCobs, 
+                numFarmers, maxSteps, timeout);
         
         try {
             out.writeObject(msgOut);
@@ -63,6 +61,10 @@ public class CCController {
                     + "FI server");
             System.exit(1);
         }
+    }
+    
+    public void readyToPrep() {
+        ccGUI.readyToPrep();
     }
     
     public void prepComplete() {
