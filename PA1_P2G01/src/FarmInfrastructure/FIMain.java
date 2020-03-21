@@ -136,6 +136,7 @@ public class FIMain {
             } catch (SocketTimeoutException ex) {}
         } while(waitconnection);
         
+        
         /* Wait for all the farmers to die. */
         for(int i = 0; i < 5; i++){
             try {

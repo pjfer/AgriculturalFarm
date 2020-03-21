@@ -94,6 +94,9 @@ public class MGranary {
                     return true;
                 }   
             }
+            else{
+                return true;
+            }
         }
         catch (InterruptedException e) {
             System.err.println("ERROR: Farmer was badly interrupted when "

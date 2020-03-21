@@ -114,7 +114,6 @@ public class TFarmer extends Thread{
             
             /*Enters the store house again and checks if it has to die.*/
             exit = sh.enterSH(id);
-            
             /*Deposits the corn cobs.*/
             while(!has_finished){
                 has_finished = sh.depositCorn(id);

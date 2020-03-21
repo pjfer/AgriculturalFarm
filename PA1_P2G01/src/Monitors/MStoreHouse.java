@@ -58,15 +58,6 @@ public class MStoreHouse {
         
     }
     
-    public void releaseWaitingStart(){
-        rl.lock();
-        try {
-            waitStart.signalAll();
-        } finally {
-            rl.unlock();
-        }
-    }
-    
     public void exitSimulation(){
         rl.lock();
         try {
@@ -114,6 +105,9 @@ public class MStoreHouse {
                 if (cobsDeposited[farmerId-1] == nCobs){
                     return true;
                 }  
+            }
+            else{
+                return true;
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(MStoreHouse.class.getName()).log(Level.SEVERE, null, ex);
