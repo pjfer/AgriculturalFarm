@@ -115,7 +115,7 @@ public class MGranary {
         try {
             allCorbsCollected = true;
             farmerCobsCollected.signalAll();
-            fiController.allCorbsCollected = true;
+            fiController.allCobsCollected = true;
         }
         finally {
             rl.unlock();

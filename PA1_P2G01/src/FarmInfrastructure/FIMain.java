@@ -141,7 +141,7 @@ public class FIMain {
             try {
                 threads[i].join();
                 /*
-                    Send message that all farmer threads were terminated were killed.
+                    Send message that the farmer thread has terminated.
                 */
                 fiController.farmerTerminated(i+1);
                 

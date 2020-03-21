@@ -15,20 +15,53 @@ import java.net.Socket;
  */
 public class FIServer {
     
+    /**
+     * Farm infrastructure server port.
+     */
     private final Integer port;
+    
+    /**
+     * Farm Infrastructure server socket.
+     */
     private ServerSocket socket;
+    
+    /**
+     * Socket that handles the requests from the Control Center.
+     */
     private Socket clientSocket;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
+    
+    /**
+     * Farm Infrastructure Controller that executes the requests received.
+     */
     private final FIController fiController;
+    
+    /**
+     * Thread that handles the incoming requests.
+     */
     private TCCCom ccCom;
+    
+    /**
+     * Flag that signals if the server socket was closed or not
+     */
     private boolean closed;
     
+    /**
+     * Default Constructor.
+     * 
+     * @param port Farm infrastructure server port.
+     * @param fiController Farm Infrastructure Controller that 
+     * executes the requests received.
+     */
     public FIServer(Integer port, FIController fiController){
         this.port = port;
         this.fiController = fiController;
     }
     
+    /**
+     * Method used to start the server socket.
+     * 
+     * @return Boolean that indicates if the server was successfully started.
+     */
     public boolean start() {
         try {
             socket = new ServerSocket(port);
@@ -43,10 +76,13 @@ public class FIServer {
         }
     }
     
+    /**
+     * Method used to stop the server socket.
+     * 
+     * @return Boolean that indicates if the server was successfully stopped.
+     */
     public boolean close() {
         try {
-            in.close();
-            out.close();
             socket.close();
             System.out.println("Server closed on port " + port);
             closed = true;
@@ -61,6 +97,11 @@ public class FIServer {
         
     }
     
+    /**
+     * Method called while the server is listening.
+     * Creates a thread for each new request received.
+     * 
+     */
     public void newConnection(){
         try {
             clientSocket = socket.accept();
