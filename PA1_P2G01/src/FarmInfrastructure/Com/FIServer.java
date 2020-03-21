@@ -3,13 +3,11 @@ package FarmInfrastructure.Com;
 import FarmInfrastructure.FIController;
 import FarmInfrastructure.Thread.TCCCom;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * 
+ * Class that represents the server for the Farm Infrastructure.
  * 
  * @author Pedro Ferreira and Rafael Teixeira
  */

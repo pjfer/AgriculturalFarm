@@ -1,7 +1,6 @@
 
 package FarmInfrastructure.Com;
 
-import Communication.HarvestConfig;
 import Communication.HarvestState;
 import Communication.Message;
 import java.io.IOException;
@@ -12,6 +11,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+/**
+ * Class that encapsulates the communication to the Control Center from the 
+ * Farm infrastructure.
+ * 
+ * @author Rafael Teixeira
+ */
 public class CcStub {
     
     /**
