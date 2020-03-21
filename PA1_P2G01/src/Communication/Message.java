@@ -10,12 +10,17 @@ import java.io.Serializable;
 public class Message implements Serializable {
     private String body;
     private HarvestState type;
-    private Long farmerID;
+    private Long farmerID = -1L;
+    
+    private Integer numCornCobs = -1;
+    private Integer numFarmers = -1;
+    private Integer numMaxSteps = -1;
+    private Integer timeoutPath = -1;
+    
     
     public Message() {
         body = "";
         type = HarvestState.Prepare;
-        farmerID = -1L;
     }
     
     public Message(String body) {
@@ -41,6 +46,15 @@ public class Message implements Serializable {
         this.farmerID = farmerID;
     }
     
+    public Message(HarvestState type, Integer numCornCobs, 
+            Integer numFarmers, Integer numMaxSteps, Integer timeoutPath) {
+        this.type = type;
+        this.numCornCobs = -numCornCobs;
+        this.numFarmers = numFarmers;
+        this.numMaxSteps = numMaxSteps;
+        this.timeoutPath = timeoutPath;
+    }
+    
     public String getBody() {
         return body;
     }
@@ -64,4 +78,22 @@ public class Message implements Serializable {
     public void setFarmerID(Long farmerID) {
         this.farmerID = farmerID;
     }
+    
+    public Integer getNumCornCobs() {
+        return numCornCobs;
+    }
+
+    public Integer getNumFarmers() {
+        return numFarmers;
+    }
+
+    public Integer getNumMaxSteps() {
+        return numMaxSteps;
+    }
+
+    public Integer getTimeoutPath() {
+        return timeoutPath;
+    }
+
 }
+

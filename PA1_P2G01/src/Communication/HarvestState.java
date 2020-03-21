@@ -6,7 +6,7 @@ package Communication;
  * @author Pedro Ferreira and Rafael Teixeira
  */
 public enum HarvestState {
-    Prepare, Start, WaitToWalk,  Walking, WaitToCollect, Collect, WaitToReturn, Return, Store,
-    Stop, Exit
+    WaitToStart, Prepare, WaitToWalk, Start, WaitToCollect, Collect, 
+    WaitToReturn, Return, Stop, Exit, Update, FarmerTerminated
 
 }
