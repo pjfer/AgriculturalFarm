@@ -3,6 +3,8 @@ package FarmInfrastructure.Com;
 import FarmInfrastructure.FIController;
 import FarmInfrastructure.Thread.TCCCom;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -103,7 +105,20 @@ public class FIServer {
     public void newConnection(){
         try {
             clientSocket = socket.accept();
-            ccCom = new TCCCom(clientSocket, fiController);
+            
+            System.out.println("BANANA");
+            
+            //Create the Stream to retrieve messages.
+            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+            
+            System.out.println("BANANA");
+
+            //Create the Stream to send messages.
+            ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+            
+            System.out.println("BANANA");
+            
+            ccCom = new TCCCom(clientSocket, fiController, in, out);
             ccCom.start();
         }
         catch (IOException e) {

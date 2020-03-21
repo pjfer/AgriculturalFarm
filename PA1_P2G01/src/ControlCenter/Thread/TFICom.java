@@ -27,16 +27,18 @@ public class TFICom extends Thread {
         super();
     }
     
-    public TFICom(Socket clientSocket, CCController ccController) {
+    public TFICom(Socket clientSocket, CCController ccController, 
+            ObjectInputStream in, ObjectOutputStream out) {
         this.clientSocket = clientSocket;
         this.ccController = ccController;
         this.msgBody = "200 OK";
+        this.in = in;
+        this.out = out;
     }
     
     @Override
     public void run() {
         try {
-            in = new ObjectInputStream(clientSocket.getInputStream());
             msgIn = (Message) in.readObject();
             hvState = msgIn.getType();
             
@@ -76,7 +78,6 @@ public class TFICom extends Thread {
                     System.exit(1);
             }
             
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
             msgOut = new Message(msgBody, hvState);
             out.writeObject(msgOut);
             out.flush();

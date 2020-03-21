@@ -1,9 +1,9 @@
 
 package FarmInfrastructure.Com;
 
+import Communication.ClientCom;
 import Communication.HarvestState;
 import Communication.Message;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -61,8 +61,6 @@ public class CcStub {
     public CcStub(String host, Integer ccPort){
         this.host = host;
         this.ccPort = ccPort;
-        
-        
     }
     
     /**
@@ -71,7 +69,7 @@ public class CcStub {
      */
     public void farmersReady(){
         
-        String msgBody = "All Farmers are waiting in the Store House";
+        String msgBody = "All Farmers are waiting in the Store House\n";
         msgOut = new Message(msgBody, HarvestState.WaitToStart);
         this.sendMessage(msgOut);
  
@@ -83,7 +81,7 @@ public class CcStub {
      */
     public void farmersPrepared(){
         
-        String msgBody = "All Farmers are waiting in the Standing Area";
+        String msgBody = "All Farmers are waiting in the Standing Area\n";
         msgOut = new Message(msgBody, HarvestState.WaitToWalk);
         this.sendMessage(msgOut);
         
@@ -95,7 +93,7 @@ public class CcStub {
      */
     public void farmersWCollect(){
         
-        String msgBody = "All Farmers are waiting in the Granary";
+        String msgBody = "All Farmers are waiting in the Granary\n";
         msgOut = new Message(msgBody, HarvestState.WaitToCollect);
         this.sendMessage(msgOut);
     
@@ -107,7 +105,7 @@ public class CcStub {
      */
     public void farmersWProceed(){
         
-        String msgBody = "All Farmers are waiting to Return";
+        String msgBody = "All Farmers are waiting to Return\n";
         msgOut = new Message(msgBody, HarvestState.WaitToReturn);
         this.sendMessage(msgOut);
 
@@ -133,7 +131,7 @@ public class CcStub {
      */
     public void farmerTerminated(int farmerId){
         
-        msgOut = new Message("Farmer: " + farmerId + "has terminated.",
+        msgOut = new Message("Farmer: " + farmerId + "has terminated.\n",
                 HarvestState.FarmerTerminated);
         this.sendMessage(msgOut);
         
@@ -142,36 +140,22 @@ public class CcStub {
     /**
      * Private Method that handles the delivery of the message and its answer.
      */
-    private void sendMessage(Message msgOut){
-        try {
-            clientSocket = new Socket(host, ccPort);
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            out.writeObject(msgOut);
-            out.flush();
-            
-            in = new ObjectInputStream(clientSocket.getInputStream());
-            msgIn = (Message) in.readObject();
-            
-            if(msgIn.getType() == HarvestState.Error){
-                System.err.println(msgIn.getBody());
-                System.exit(1);
+    private void sendMessage(Message msgOut) {
+        ClientCom ccon = new ClientCom(host, ccPort);
+        
+        while (!ccon.open()) {
+            try {
+                Thread.currentThread().sleep((long) 10);
             }
-        }
-        catch (IOException | ClassNotFoundException e) {
-            System.err.println("ERROR: Unable to send the message to the "
-                    + "CC server");
-            System.exit(1);
+            catch (InterruptedException e) { }
         }
         
-        try {
-            //Close the communication channels.
-            in.close();
-            out.close();
-            clientSocket.close();
-        }
-        catch(IOException e) {
-            System.err.println("ERROR: Unable to close the connection of " +
-                    clientSocket);
+        ccon.writeObject(msgOut);
+        
+        msgIn = (Message) ccon.readObject();
+        
+        if(msgIn.getType() == HarvestState.Error){
+            System.err.println(msgIn.getBody());
             System.exit(1);
         }
     }

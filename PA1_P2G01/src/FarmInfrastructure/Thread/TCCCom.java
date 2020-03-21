@@ -61,13 +61,26 @@ public class TCCCom extends Thread {
      * 
      * @param clientSocket Communication socket that received the request.
      * @param fiController Farm Interface Controller that executes the request.
+     * @param in
+     * @param out
      */
-    public TCCCom(Socket clientSocket, FIController fiController) {
+    public TCCCom(Socket clientSocket, FIController fiController, 
+            ObjectInputStream in, ObjectOutputStream out) {
         this.clientSocket = clientSocket;
         this.fiController = fiController;
         
+        System.out.println("BANANAMORE");
+        
         //Default Response Message
         this.msgOut = new Message("200 Good Request", HarvestState.Ok);
+        
+        this.in = in;
+        
+        System.out.println("BANANAMORE");
+        
+        this.out = out;
+        
+        System.out.println("BANANAMORE");
     }
     
     
@@ -77,9 +90,6 @@ public class TCCCom extends Thread {
      */
     public void run() {
         try {
-            //Create the Stream to receive messages.
-            in = new ObjectInputStream(clientSocket.getInputStream());
-            
             // Obtain the request message.
             msgIn = (Message) in.readObject();
             hvState = msgIn.getType();
@@ -121,9 +131,6 @@ public class TCCCom extends Thread {
                     this.msgOut.setBody("400 Bad Request.");
                     this.msgOut.setType(HarvestState.Error);
             }
-            
-            //Create the Stream to send messages.
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
             
             //Send the response message.
             out.writeObject(msgOut);

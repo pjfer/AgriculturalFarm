@@ -60,7 +60,12 @@ public class CCServer {
     public void newConnection(CCController ccController) {
         try {
             clientSocket = socket.accept();
-            fiCom = new TFICom(clientSocket, ccController);
+            //Create the Stream to retrieve messages.
+            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+
+            //Create the Stream to send messages.
+            ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+            fiCom = new TFICom(clientSocket, ccController, in, out);
             fiCom.start();
         }
         catch (IOException e) {

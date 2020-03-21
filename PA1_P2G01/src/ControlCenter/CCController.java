@@ -1,5 +1,6 @@
 package ControlCenter;
 
+import Communication.ClientCom;
 import Communication.HarvestState;
 import Communication.Message;
 import ControlCenter.GraphicalInterface.ControlCenterGUI;
@@ -140,14 +141,21 @@ public class CCController {
     }
     
     private void sendMessage() {
-        try {
-            out = new ObjectOutputStream(socket.getOutputStream());
-            out.writeObject(msgOut);
-            out.flush();
+        ClientCom ccon = new ClientCom(host, port);
+        
+        while (!ccon.open()) {
+            try {
+                Thread.currentThread().sleep((long) 10);
+            }
+            catch (InterruptedException e) { }
         }
-        catch (IOException e) {
-            System.err.println("ERROR: Unable to send the message to the "
-                    + "FI server");
+        
+        ccon.writeObject(msgOut);
+        
+        msgIn = (Message) ccon.readObject();
+        
+        if(msgIn.getType() == HarvestState.Error){
+            System.err.println(msgIn.getBody());
             System.exit(1);
         }
     }

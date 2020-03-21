@@ -139,7 +139,7 @@ public class FIController {
                 + " entered in the Store House in position: " + position);
         
         cc.update("Farmer: " + farmerId 
-                + " entered in the Store House in position: " + position);
+                + " entered in the Store House in position: " + position + "\n");
     }
     
     /**
@@ -151,7 +151,7 @@ public class FIController {
      */
     public void farmerAwaiting(int farmerId) {
         System.out.println("Farmer: " + farmerId + " is awaiting in the SH.");
-        cc.update("Farmer: " + farmerId + " is awaiting in the Store House.");
+        cc.update("Farmer: " + farmerId + " is awaiting in the Store House.\n");
         counter ++;
         
         if(counter == nFarmers){
@@ -176,7 +176,7 @@ public class FIController {
         
         cc.update("Farmer: " + farmerId + 
                 " entered the Standing Area in the position: " 
-                + (position + 1));
+                + (position + 1) + "\n" );
         
         counter ++;
         
@@ -203,7 +203,7 @@ public class FIController {
                 + position[0] + " : "+ position[1]);
         
         cc.update("Farmer: " + farmerId + " moved in Path to the position: " 
-                + position[0] + " : "+ position[1]);
+                + position[0] + " : "+ position[1] + "\n");
     }
 
     /**
@@ -219,7 +219,7 @@ public class FIController {
                 " entered the Granary in the position: "+ position);
         
         cc.update("Farmer: " + farmerId + 
-                " entered the Granary in the position: "+ position);
+                " entered the Granary in the position: "+ position + "\n");
         
         counter ++;
         
@@ -239,7 +239,7 @@ public class FIController {
      */
     public void collectCorn(Integer farmerId){
         System.out.println("Farmer: " + farmerId + " colected one cobs.");
-        cc.update("Farmer: " + farmerId + " colected one corn.");
+        cc.update("Farmer: " + farmerId + " colected one corn.\n");
     }
     
     /**
@@ -251,7 +251,7 @@ public class FIController {
      */
     public void storeCorn(Integer farmerId) {
         System.out.println("Farmer: " + farmerId + " stored one cobs.");
-        cc.update("Farmer: " + farmerId + " stored one corn.");
+        cc.update("Farmer: " + farmerId + " stored one corn.\n");
     }
     
     /**
