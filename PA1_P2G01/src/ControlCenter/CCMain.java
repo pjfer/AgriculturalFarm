@@ -2,16 +2,12 @@ package ControlCenter;
 
 import Communication.ServerCom;
 import ControlCenter.Thread.TFICom;
-import FarmInfrastructure.FIMain;
-
 import java.net.SocketTimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- * 
- * 
- * @author Pedro Ferreira and Rafael Teixeira
+ * Main class responsible for the instantiation and initialization of the 
+ * control center server and the threads created to respond to client's messages,
+ * as well as the control center controller.
  */
 public class CCMain {
     public static void main(String[] args) {
@@ -20,18 +16,16 @@ public class CCMain {
         Integer fiPort = 1300;
         CCController ccController = new CCController(host, fiPort);
         TFICom handler;
-        /**
-         * Communication Channel of the server.
-         */
         ServerCom scon, sconi;
-        scon = new ServerCom (ccPort);                            // criação do canal de escuta e sua associação
-        scon.start (); 
+        scon = new ServerCom(ccPort);
+        
+        scon.start();
         
         do {
             try {
                 sconi = scon.accept();
-                handler = new TFICom(sconi, ccController);              // lançamento do agente prestador do serviço
-                handler.start ();                               // entrada em processo de escuta
+                handler = new TFICom(sconi, ccController);
+                handler.start();
             } catch (SocketTimeoutException ex) {}
         } while(ccController.continueSimulation());
         

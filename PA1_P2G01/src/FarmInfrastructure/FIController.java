@@ -11,8 +11,6 @@ import Monitors.Interfaces.IStoreHouseC;
  * Class responsible for the update of the graphical interface,
  * execution of the requests of the Control Center and the delivery of the
  * update messages to the it.
- * 
- * @author Pedro Ferreira and Rafael Teixeira
  */
 public class FIController {
     

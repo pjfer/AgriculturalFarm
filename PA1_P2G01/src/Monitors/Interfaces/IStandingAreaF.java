@@ -2,8 +2,6 @@ package Monitors.Interfaces;
 
 /**
  * Interface for the Farmer to access the Standing Area.
- *
- * @author Rafael Teixeira e Pedro Ferreira
  */
 public interface IStandingAreaF {
     /**

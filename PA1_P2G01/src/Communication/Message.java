@@ -3,49 +3,79 @@ package Communication;
 import java.io.Serializable;
 
 /**
- * Class responsible for a message's infrastructure.
- *
- * @author Pedro Ferreira and Rafael Teixeira
+ * Class responsible for a message's infrastructure, used in the communication
+ * between clients and servers.
  */
 public class Message implements Serializable {
-    private String body;
+    /**
+     * Information about the system that is mainly used as context.
+     */
+    private String body = "";
+    
+    /**
+     * States the state of the message, as well as the state of the system.
+     */
     private HarvestState type;
+    
+    /**
+     * Identifies, when available, which farmer sent the message.
+     */
     private Long farmerID = -1L;
     
+    /**
+     * Total number of corn cobs that each farmer needs to get.
+     */
     private Integer numCornCobs = -1;
+    
+    /**
+     * Total number of farmers that are going to harvest.
+     */
     private Integer numFarmers = -1;
+    
+    /**
+     * Total number of maximum steps that each farmer can do in the path.
+     */
     private Integer numMaxSteps = -1;
+    
+    /**
+     * Total time needed for each farmer, when he moves in the path.
+     */
     private Integer timeoutPath = -1;
     
-    
-    public Message() {
-        body = "";
-        type = HarvestState.Prepare;
-    }
-    
-    public Message(String body) {
-        this.body = body;
-    }
-    
-    public Message(HarvestState type) {
-        this.type = type;
-    }
-    
-    public Message(Long farmerID) {
-        this.farmerID = farmerID;
-    }
-    
+    /**
+     * Instantiation of a message from a non-farmer entity.
+     * 
+     * @param body information about the system.
+     * @param type state of the system.
+     */
     public Message(String body, HarvestState type) {
         this.body = body;
         this.type = type;
     }
     
+    /**
+     * Instantiation of a message from a farmer.
+     * 
+     * @param body information about the system.
+     * @param type state of the system.
+     * @param farmerID farmer's thread id.
+     */
     public Message(String body, HarvestState type, Long farmerID) {
         this.body = body;
         this.type = type;
         this.farmerID = farmerID;
     }
     
+    /**
+     * Instantiation of a message when the control center sends the preparation
+     * configuration to the farm infrastructure.
+     * 
+     * @param type state of the system.
+     * @param numCornCobs total number of corn cobs that each farmer has to get.
+     * @param numFarmers total number of farmers that are going to harvest.
+     * @param numMaxSteps maximum number of steps that each farmer can do.
+     * @param timeoutPath time needed for each farmer, when moving in the path.
+     */
     public Message(HarvestState type, Integer numCornCobs, 
             Integer numFarmers, Integer numMaxSteps, Integer timeoutPath) {
         this.type = type;
@@ -82,11 +112,11 @@ public class Message implements Serializable {
     public Integer getNumCornCobs() {
         return numCornCobs;
     }
-
+    
     public Integer getNumFarmers() {
         return numFarmers;
     }
-
+    
     public Integer getNumMaxSteps() {
         return numMaxSteps;
     }

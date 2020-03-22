@@ -5,13 +5,9 @@ import Monitors.Interfaces.IStoreHouseC;
 import Monitors.Interfaces.IStoreHouseF;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class with the task of controlling the access to the Store House.
- * 
- * @author Rafael Teixeira e Pedro Ferreira
  */
 public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
     
@@ -200,8 +196,8 @@ public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
                 return true;
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(MStoreHouse.class.getName())
-                    .log(Level.SEVERE, null, ex);
+            System.err.println("ERROR: Farmer " + farmerId + " was unable to "
+                    + "deposit the corn cob!");
         }
         return false;
     }

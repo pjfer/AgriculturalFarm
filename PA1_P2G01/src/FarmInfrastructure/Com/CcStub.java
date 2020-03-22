@@ -9,8 +9,6 @@ import Communication.Message;
 /**
  * Class that encapsulates the communication to the Control Center from the 
  * Farm infrastructure.
- * 
- * @author Rafael Teixeira e Pedro Ferreira
  */
 public class CcStub {
     

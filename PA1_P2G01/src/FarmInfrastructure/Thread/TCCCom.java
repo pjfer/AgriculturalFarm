@@ -8,8 +8,6 @@ import FarmInfrastructure.FIController;
 /**
  * TCCCom is a thread built to handle 
  * the Farm Interface server requests received.
- *
- * @author Rafael Teixeira & Pedro Ferreira
  */
 public class TCCCom extends Thread {
     /**

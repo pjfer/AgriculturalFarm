@@ -6,8 +6,6 @@ import Monitors.Interfaces.IStoreHouseF;
 
 /**
  * Class that represents a farmer.
- * 
- * @author Rafael Teixeira e Pedro Ferreira
  */
 public class TFarmer extends Thread{
     

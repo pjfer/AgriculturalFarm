@@ -5,14 +5,10 @@ import Monitors.Interfaces.IStandingAreaC;
 import Monitors.Interfaces.IStandingAreaF;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
  * Class with the task of controlling the access to the Standing Area.
- * 
- * @author Rafael Teixeira e Pedro Ferreira
  */
 public class MStandingArea implements IStandingAreaC, IStandingAreaF{
     
@@ -69,6 +65,7 @@ public class MStandingArea implements IStandingAreaC, IStandingAreaF{
         
     }
     
+    @Override
     public void enterSA(int farmerId){
         rl.lock();
         
@@ -89,12 +86,14 @@ public class MStandingArea implements IStandingAreaC, IStandingAreaF{
             }
             
         } catch (InterruptedException ex) {
-            Logger.getLogger(MStandingArea.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("ERROR: Farmer " + farmerId + " was unable to "
+                    + "enter the standing area!");
         } finally {
             rl.unlock();
         }
     }
     
+    @Override
     public void proceedToPath(){
         rl.lock();
         try{
@@ -154,7 +153,4 @@ public class MStandingArea implements IStandingAreaC, IStandingAreaF{
         }
         
     }
-    
-    
-    
 }

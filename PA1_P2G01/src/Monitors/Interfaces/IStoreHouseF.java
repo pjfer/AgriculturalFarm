@@ -2,8 +2,6 @@ package Monitors.Interfaces;
 
 /**
  * Interface for the Farmer to access the Store House.
- *
- * @author Rafael Teixeira e Pedro Ferreira
  */
 public interface IStoreHouseF {
     

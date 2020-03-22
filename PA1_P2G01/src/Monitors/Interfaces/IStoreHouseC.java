@@ -2,8 +2,6 @@ package Monitors.Interfaces;
 
 /**
  * Interface for the Farm Controller to access the Store House.
- *
- * @author Rafael Teixeira e Pedro Ferreira
  */
 public interface IStoreHouseC {
     

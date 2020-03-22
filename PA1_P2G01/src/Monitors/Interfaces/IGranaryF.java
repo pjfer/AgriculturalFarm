@@ -2,12 +2,24 @@ package Monitors.Interfaces;
 
 /**
  * Interface for the Farmer to access the Granary.
- *
- * @author Rafael Teixeira e Pedro Ferreira
  */
 public interface IGranaryF {
-    
+    /**
+     * 
+     * @param farmerId 
+     */
     void enterGranary(int farmerId);
+    
+    /**
+     * 
+     * @param farmerId
+     * @return 
+     */
     boolean collectCob(int farmerId);
+    
+    /**
+     * 
+     * @param farmerId 
+     */
     void waitForColleagues(int farmerId);
 }
