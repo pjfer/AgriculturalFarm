@@ -3,6 +3,7 @@ package Monitors;
 import FarmInfrastructure.FIController;
 import Monitors.Interfaces.IGranaryC;
 import Monitors.Interfaces.IGranaryF;
+import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -119,6 +120,9 @@ public class MGranary implements IGranaryC, IGranaryF {
             farmerCobsCollected.signalAll();
         }
         finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -155,6 +159,9 @@ public class MGranary implements IGranaryC, IGranaryF {
                     + "entering the Granary!");
         }
         finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -213,6 +220,9 @@ public class MGranary implements IGranaryC, IGranaryF {
                     + "waiting for colleagues to collect all the corbs!");
         }
         finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -231,6 +241,9 @@ public class MGranary implements IGranaryC, IGranaryF {
             fiController.allCobsCollected = true;
         }
         finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -249,7 +262,21 @@ public class MGranary implements IGranaryC, IGranaryF {
             fiController.allFarmersInGranary = true;
         }
         finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
+    
+    private long randomTimeout(){
+        Random rand = new Random();
+
+        int n = rand.nextInt(100);
+
+        n += 1;
+        
+        return n;
+    }
+    
 }

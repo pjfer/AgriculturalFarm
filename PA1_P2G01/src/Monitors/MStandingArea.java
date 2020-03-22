@@ -3,6 +3,7 @@ package Monitors;
 import FarmInfrastructure.FIController;
 import Monitors.Interfaces.IStandingAreaC;
 import Monitors.Interfaces.IStandingAreaF;
+import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -89,6 +90,9 @@ public class MStandingArea implements IStandingAreaC, IStandingAreaF{
             System.err.println("ERROR: Farmer " + farmerId + " was unable to "
                     + "enter the standing area!");
         } finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -104,6 +108,9 @@ public class MStandingArea implements IStandingAreaC, IStandingAreaF{
             proceedPath.signalAll();
         }catch(Exception e){}
         finally{
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -149,8 +156,22 @@ public class MStandingArea implements IStandingAreaC, IStandingAreaF{
             proceedPath.signalAll();
         }
         finally{
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
         
     }
+    
+    private long randomTimeout(){
+        Random rand = new Random();
+
+        int n = rand.nextInt(100);
+
+        n += 1;
+        
+        return n;
+    }
+    
 }

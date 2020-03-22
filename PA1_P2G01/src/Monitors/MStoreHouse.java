@@ -3,6 +3,7 @@ package Monitors;
 import FarmInfrastructure.FIController;
 import Monitors.Interfaces.IStoreHouseC;
 import Monitors.Interfaces.IStoreHouseF;
+import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -103,6 +104,9 @@ public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
             waitStart.signalAll();
         }
         finally{
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -114,6 +118,9 @@ public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
         try {
             this.stopSimulation = true;
         } finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
         
@@ -128,6 +135,9 @@ public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
             this.stopSimulation = true;
             waitStart.signalAll();
         } finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -153,6 +163,9 @@ public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
         }
         catch(InterruptedException Ex){}
         finally{
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -235,6 +248,16 @@ public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
                 farmersPosition[i] = -1;
             }
         }
+    }
+    
+    private long randomTimeout(){
+        Random rand = new Random();
+
+        int n = rand.nextInt(100);
+
+        n += 1;
+        
+        return n;
     }
     
     

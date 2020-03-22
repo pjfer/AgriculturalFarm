@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -129,6 +130,9 @@ public class MPath implements IPathC, IPathF {
             farmerMoveForward.signalAll(); 
         }
         finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
     }
@@ -175,6 +179,9 @@ public class MPath implements IPathC, IPathF {
                     + "entering the Path!");
         }
         finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
         
@@ -244,6 +251,9 @@ public class MPath implements IPathC, IPathF {
                     + "moving forward in the Path!");
         }
         finally {
+            try{
+                Thread.sleep(this.randomTimeout());
+            } catch (InterruptedException ex) {}
             rl.unlock();
         }
         return false;
@@ -329,6 +339,17 @@ public class MPath implements IPathC, IPathF {
     private boolean positionTaken(Integer[] position) {
         return positions.values().stream().anyMatch((posTaken) -> 
                 (Arrays.equals(position, posTaken)));
+    }
+    
+    
+    private long randomTimeout(){
+        Random rand = new Random();
+
+        int n = rand.nextInt(100);
+
+        n += 1;
+        
+        return n;
     }
     
 }
