@@ -250,16 +250,12 @@ public class MStoreHouse implements IStoreHouseC, IStoreHouseF {
         }
     }
     
+    /**
+     * Get the random time, between 0 and 100, to put the thread to sleep.
+     * 
+     * @return random number between 0 and 100.
+     */
     private long randomTimeout(){
-        Random rand = new Random();
-
-        int n = rand.nextInt(100);
-
-        n += 1;
-        
-        return n;
-    }
-    
-    
-        
+        return new Random().nextInt(101);
+    }   
 }

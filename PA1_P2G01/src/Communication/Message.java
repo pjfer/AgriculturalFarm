@@ -18,11 +18,6 @@ public class Message implements Serializable {
     private HarvestState type;
     
     /**
-     * Identifies, when available, which farmer sent the message.
-     */
-    private Long farmerID = -1L;
-    
-    /**
      * Total number of corn cobs that each farmer needs to get.
      */
     private Integer numCornCobs = -1;
@@ -51,19 +46,6 @@ public class Message implements Serializable {
     public Message(String body, HarvestState type) {
         this.body = body;
         this.type = type;
-    }
-    
-    /**
-     * Instantiation of a message from a farmer.
-     * 
-     * @param body information about the system.
-     * @param type state of the system.
-     * @param farmerID farmer's thread id.
-     */
-    public Message(String body, HarvestState type, Long farmerID) {
-        this.body = body;
-        this.type = type;
-        this.farmerID = farmerID;
     }
     
     /**
@@ -99,14 +81,6 @@ public class Message implements Serializable {
     
     public void setType(HarvestState type) {
         this.type = type;
-    }
-    
-    public Long getFarmerID() {
-        return farmerID;
-    }
-    
-    public void setFarmerID(Long farmerID) {
-        this.farmerID = farmerID;
     }
     
     public Integer getNumCornCobs() {
