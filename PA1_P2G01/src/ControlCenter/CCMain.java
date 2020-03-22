@@ -30,5 +30,7 @@ public class CCMain {
         } while(ccController.continueSimulation());
         
         scon.end();
+        
+        System.out.println("End of Simulation");
     }
 }

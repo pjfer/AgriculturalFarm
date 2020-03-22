@@ -4,6 +4,7 @@ import java.util.Arrays;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import ControlCenter.CCController;
+import javax.swing.text.DefaultCaret;
 
 /**
  * Class for the graphical user interface of the control center.
@@ -27,6 +28,7 @@ public class ControlCenterGUI extends javax.swing.JFrame {
      */
     public void updateTextArea(String text) {
         jTextArea1.append(text);
+        jTextArea1.setCaretPosition(jTextArea1.getText().length());
     }
     
     /**
@@ -35,7 +37,12 @@ public class ControlCenterGUI extends javax.swing.JFrame {
      * infrastructure is ready to receive the harvest configuration.
      */
     public void readyToPrep() {
+        jTextField1.setEnabled(true);
+        jTextField2.setEnabled(true);
+        jTextField3.setEnabled(true);
+        jTextField4.setEnabled(true);
         jButton1.setEnabled(true);
+        jButton5.setEnabled(false);
         jButton6.setEnabled(true);
     }
     
