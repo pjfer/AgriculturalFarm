@@ -4,7 +4,6 @@ import java.util.Arrays;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import ControlCenter.CCController;
-import javax.swing.text.DefaultCaret;
 
 /**
  * Class for the graphical user interface of the control center.
@@ -42,6 +41,9 @@ public class ControlCenterGUI extends javax.swing.JFrame {
         jTextField3.setEnabled(true);
         jTextField4.setEnabled(true);
         jButton1.setEnabled(true);
+        jButton2.setEnabled(false);
+        jButton3.setEnabled(false);
+        jButton4.setEnabled(false);
         jButton5.setEnabled(false);
         jButton6.setEnabled(true);
     }
