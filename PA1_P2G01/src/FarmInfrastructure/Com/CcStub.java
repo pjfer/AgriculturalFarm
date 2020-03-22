@@ -116,6 +116,15 @@ public class CcStub {
         this.sendMessage(msgOut);
         
     }
+    /**
+     * Method called to indicate that all farmers are terminated.
+     * 
+     */
+    public void allFarmersTerminated(){
+        msgOut = new Message("All Farmers Terminated.\n",
+                HarvestState.Exit);
+        this.sendMessage(msgOut);
+    }
     
     /**
      * Private Method that handles the delivery of the message and its answer.
