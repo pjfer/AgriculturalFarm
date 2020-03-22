@@ -144,8 +144,6 @@ public class FIMain {
                 
                 /*Send message that the farmer thread has terminated.*/
                 fiController.farmerTerminated(i+1);
-                
-                System.out.println("Farmer "+(i+1)+ " has died");
             } catch (InterruptedException ex) {
                 System.err.println("ERROR: Unable to terminate farmer " + i);
             } 

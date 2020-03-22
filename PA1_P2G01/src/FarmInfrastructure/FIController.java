@@ -273,7 +273,7 @@ public class FIController {
     public void farmerTerminated(int farmerId) {
         counter ++;
         cc.farmerTerminated(farmerId);
-        
+        System.out.println("Farmer "+(farmerId)+ " has died");
         if(counter == 5){
             System.out.println("All Farmers Terminated");
             cc.allFarmersTerminated();
