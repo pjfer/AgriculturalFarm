@@ -87,6 +87,8 @@ public class TFICom extends Thread {
                 break;
             case Exit:
                 ccController.updateGUITextArea(msgIn.getBody());
+                sconi.writeObject(msgOut);
+                sconi.close();
                 ccController.fiExited();
                 break;
             default:
@@ -94,7 +96,9 @@ public class TFICom extends Thread {
                 msgOut.setType(HarvestState.Error);
         }
         
-        sconi.writeObject(msgOut);
-        sconi.close();
+        if (hvState != HarvestState.Exit) {
+            sconi.writeObject(msgOut);
+            sconi.close();
+        }
     }
 }

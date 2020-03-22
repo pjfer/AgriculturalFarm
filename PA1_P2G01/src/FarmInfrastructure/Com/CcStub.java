@@ -111,7 +111,7 @@ public class CcStub {
      */
     public void farmerTerminated(int farmerId){
         
-        msgOut = new Message("Farmer: " + farmerId + "has terminated.\n",
+        msgOut = new Message("Farmer: " + farmerId + " has terminated.\n",
                 HarvestState.FarmerTerminated);
         this.sendMessage(msgOut);
         
