@@ -271,13 +271,14 @@ public class FIController {
      * @param farmerId Farmer ID.
      */
     public void farmerTerminated(int farmerId) {
-        counter ++;
+        
         cc.farmerTerminated(farmerId);
         
         if(counter == 5){
             System.out.println("All Farmers Terminated");
             cc.allFarmersTerminated();
         }
+        counter ++;
     }
     
     /**
